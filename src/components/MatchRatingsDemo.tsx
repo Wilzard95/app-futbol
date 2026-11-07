@@ -128,8 +128,8 @@ export default function MatchRatingsDemo(props: Props) {
         >
           {props.matches.map((item) => (
             <option key={item.id} value={item.id}>
-              {item.playedAt} · vs. {item.opponent} · {item.goalsFor}–
-              {item.goalsAgainst}
+              {item.playedAt ?? "Fecha por confirmar"} · vs. {item.opponent} ·{" "}
+              {item.goalsFor}–{item.goalsAgainst}
             </option>
           ))}
         </select>
@@ -140,8 +140,9 @@ export default function MatchRatingsDemo(props: Props) {
         <PlayerRatingView key={match.id} {...props} match={match} />
       )}
       <div className="panel-footnote">
-        Partidos, eventos y valoraciones simulados: el selector de vista simula
-        los dos roles. Los cambios se reflejan en el resumen y la titular
+        Partido y eventos registrados con la información indicada. El selector
+        de vista simula los dos roles y permite calificar como cualquiera de los
+        ocho jugadores. Los cambios se reflejan en el resumen y la titular
         durante esta sesión y se pierden al recargar. El acceso por cuentas, los
         permisos y el guardado privado requieren el backend.
       </div>
@@ -329,8 +330,8 @@ function PlayerRatingView({ match, ...props }: Props & { match: Match }) {
         </strong>
         <p>
           Estás editando únicamente la valoración de esta cuenta simulada.
-          Puedes cambiar de sesión para probar dos opiniones distintas sobre el
-          mismo evento.
+          Puedes cambiar de sesión entre los ocho jugadores para probar
+          opiniones distintas sobre el mismo evento.
         </p>
         <label>
           Simular mi cuenta
@@ -558,8 +559,8 @@ function BallotEditor({
         <p>
           Primero se calcula la nota final de cada evaluador; después se
           promedian todas. Se muestran dos decimales para apreciar ajustes
-          pequeños. En los partidos de muestra también hay valoraciones
-          ficticias precargadas.
+          pequeños. El promedio solo incluye las valoraciones que ustedes
+          guarden en esta prueba.
         </p>
       </div>
       <p className="lab-status" role="status">

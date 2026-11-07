@@ -31,7 +31,7 @@ export interface Match {
   id: string;
   tournamentId: string;
   opponent: string;
-  playedAt: string;
+  playedAt: string | null;
   goalsFor: number;
   goalsAgainst: number;
   participantIds: string[];

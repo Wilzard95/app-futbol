@@ -4,7 +4,7 @@ Base de una aplicación web para equipos de amigos: torneos, partidos, jugadores
 
 ## Estado de esta versión
 
-Demostración navegable con el equipo y la plantilla indicados por el usuario. Los partidos, eventos, cuentas y votos son simulados. No hay autenticación, servidor, persistencia, invitaciones reales ni envío de votos. Las propuestas que se ven son ejemplos precargados; recargar vuelve al estado inicial.
+Demostración navegable con el equipo, plantilla, torneo, marcador y eventos indicados por el usuario. Las cuentas y las calificaciones son simuladas. No hay autenticación, servidor, persistencia, invitaciones reales ni envío de votos entre dispositivos. Las notas y propuestas empiezan vacías; recargar vuelve al estado inicial.
 
 | Jugador         | Dorsal | Posición  |
 | --------------- | ------ | --------- |
@@ -20,10 +20,12 @@ Demostración navegable con el equipo y la plantilla indicados por el usuario. L
 La plantilla tiene ocho jugadores. Las formaciones de fútbol 11 mantienen tres vacantes y no permiten guardar una titular incompleta. El autocompletado usa a Diego como portero y prioriza las posiciones indicadas.
 
 - Resumen y plantilla con promedios independientes por torneo.
-- Resultados y participantes de muestra.
+- Un único torneo, **Grama 5**, en modalidad fútbol 6; un único partido, **vs. Compas, victoria 6–2**. La fecha está pendiente de confirmar.
+- Eventos registrados: tres goles de William, tres de Ricky, una amarilla a Ricky y una asistencia para William, Ricky y SEBAS respectivamente.
+- Los ocho jugadores están habilitados como participantes de la simulación para poder valorar y ser valorados.
 - En «Partidos», vistas separadas de administrador y jugador. El administrador registra un partido, sus participantes y sus eventos; el jugador ingresa su nota general y sus ajustes personales.
 - Valoración por evento: amarillas −2/+2, rojas −3/+3, goles 0/+1, asistencias 0/+0,5 y porterías en cero 0/+1.
-- Dos sesiones simuladas permiten probar opiniones independientes; empiezan sin nota general precargada. El promedio del partido muestra dos decimales para apreciar ajustes pequeños como +0,1.
+- Ocho sesiones simuladas permiten probar opiniones independientes; todas empiezan sin notas ni propuestas precargadas. El promedio del partido muestra dos decimales para apreciar ajustes pequeños como +0,1.
 - Ajustes acumulativos por acción; cada voto final se limita a 1–10 antes de promediar. Cambios temporales reflejados en la plantilla y la titular.
 - Fútbol **6 como modalidad principal**, además de fútbol 5 y 11.
 - Titular editable por torneo: fútbol 6 ofrece 3–2, 3–1–1, 2–2–1 y 2–3, siempre más un arquero. También hay alternativas para fútbol 5 y 11.

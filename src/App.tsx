@@ -47,12 +47,14 @@ const initials = (name: string) =>
     .map((word) => word[0])
     .slice(0, 2)
     .join("");
-const dateLabel = (value: string) =>
-  new Intl.DateTimeFormat("es-CO", {
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  }).format(new Date(`${value}T12:00:00Z`));
+const dateLabel = (value: string | null) =>
+  value
+    ? new Intl.DateTimeFormat("es-CO", {
+        day: "numeric",
+        month: "short",
+        timeZone: "UTC",
+      }).format(new Date(`${value}T12:00:00Z`))
+    : "Fecha por confirmar";
 
 function PlayerAvatar({
   player,
@@ -145,6 +147,14 @@ export default function App() {
             </tr>
           </thead>
           <tbody>
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={full ? 4 : 3} className="empty-ratings">
+                  Aún no hay calificaciones. En Partidos puedes guardar tu
+                  valoración de prueba.
+                </td>
+              </tr>
+            )}
             {rows.map(({ player, score }, index) => (
               <tr key={player.id}>
                 <td>
@@ -579,7 +589,7 @@ export default function App() {
               LA CANCHA <span>·</span> Hecho para jugar en equipo.
             </span>
             <span>
-              Partidos, eventos y votos simulados · Sin cuentas reales
+              Calificaciones y sesiones simuladas · Sin cuentas reales
             </span>
           </footer>
         </main>

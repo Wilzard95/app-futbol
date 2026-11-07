@@ -1,6 +1,6 @@
 # Propuesta de cuentas y vinculación
 
-Estado: recomendación técnica en respuesta a la consulta del usuario; pendiente de elegir y conectar el backend. La demo usa la plantilla indicada para combo del Inge y simula las sesiones, partidos y votos. No hay botones de acceso real ni credenciales configuradas.
+Estado: el usuario eligió crear un proyecto nuevo de Supabase para esta app. Falta conectar la integración con su cuenta y crear/configurar el proyecto. La demo usa la plantilla, torneo y partido indicados para combo del Inge; simula las ocho sesiones y sus votos. No hay botones de acceso real ni credenciales configuradas.
 
 ## Formas de entrar recomendadas
 
@@ -39,7 +39,7 @@ Un administrador que también juega conserva una sola cuenta: su membresía llev
 
 ## Configuración pendiente
 
-Crear el proyecto de autenticación, configurar Google OAuth y sus URLs de retorno, activar y verificar los correos de registro/recuperación, y aplicar las tablas, funciones y políticas del servidor. La web en GitHub Pages puede seguir alojando la interfaz.
+Crear un proyecto nuevo para esta app en la cuenta del usuario, configurar Google OAuth y sus URLs de retorno, activar y verificar los correos de registro/recuperación, y aplicar las tablas, funciones y políticas del servidor. La web en GitHub Pages puede seguir alojando la interfaz. La integración de Supabase fue encontrada y ofrecida; no se ha confirmado su instalación/conexión. Nunca se solicitarán contraseñas ni claves privadas por el chat.
 
 ## Fuentes oficiales
 

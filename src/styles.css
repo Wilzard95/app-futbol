@@ -582,6 +582,14 @@ h1 + p {
   border-bottom: 1px solid #f0f2eb;
   font-size: 11px;
 }
+.player-table td.empty-ratings {
+  white-space: normal;
+  text-align: left;
+  padding: 22px 24px;
+  color: #7b8e67;
+  font-size: 11px;
+  line-height: 1.9;
+}
 .player-table tbody tr:last-child td {
   border-bottom: 0;
 }
