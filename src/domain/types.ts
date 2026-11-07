@@ -36,12 +36,34 @@ export interface Match {
   participantIds: string[];
 }
 
+export type MatchEventKind =
+  | "yellow_card"
+  | "red_card"
+  | "goal"
+  | "assist"
+  | "clean_sheet";
+
+// The administrator records facts. A separate ballot evaluates their impact.
+export interface MatchEvent {
+  id: string;
+  matchId: string;
+  playerId: string;
+  kind: MatchEventKind;
+  context: string;
+}
+
+export interface EventAdjustment {
+  eventId: string;
+  value: number;
+}
+
 // These ballots are synthetic demo inputs. Real author IDs must stay on the server.
 export interface RatingBallot {
   matchId: string;
   authorPlayerId: string;
   targetPlayerId: string;
   score: number;
+  eventAdjustments?: EventAdjustment[];
 }
 
 export interface Slot {

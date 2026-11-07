@@ -7,7 +7,13 @@ import {
   matchAverage,
   tournamentAverage,
 } from "./rules.ts";
-import type { Match, RatingBallot } from "./types.ts";
+import type {
+  Match,
+  MatchEvent,
+  MatchEventKind,
+  RatingBallot,
+} from "./types.ts";
+import { adjustedRating, eventRules, validateMatchEvents } from "./events.ts";
 
 const match: Match = {
   id: "m1",
@@ -96,5 +102,172 @@ test("a proposal cannot repeat a player or omit a position", () => {
         { id: "1", tournamentId: "t1", picks: { gk: "a" } },
       ]),
     /completar/,
+  );
+});
+
+const action = (
+  id: string,
+  kind: MatchEventKind,
+  playerId = "a",
+  matchId = "m1",
+): MatchEvent => ({ id, kind, playerId, matchId, context: "" });
+
+test("each goal, assist, card and clean sheet contributes its own adjustment", () => {
+  const events = [
+    action("g1", "goal"),
+    action("g2", "goal"),
+    action("a1", "assist"),
+    action("y1", "yellow_card"),
+    action("r1", "red_card"),
+    action("c1", "clean_sheet"),
+  ];
+  const rating = {
+    ...ballot("b", 6),
+    eventAdjustments: [
+      { eventId: "g1", value: 1 },
+      { eventId: "g2", value: 1 },
+      { eventId: "a1", value: 0.5 },
+      { eventId: "y1", value: -2 },
+      { eventId: "r1", value: 3 },
+      { eventId: "c1", value: 1 },
+    ],
+  };
+  assert.equal(adjustedRating(match, rating, events).finalScore, 10);
+  assert.equal(adjustedRating(match, rating, events).adjustment, 4.5);
+  assert.equal(matchAverage(match, "a", [rating], events), 10);
+  assert.equal(tournamentAverage("t1", "a", [match], [rating], events), 10);
+});
+
+test("cards can reward or penalize; every event enforces its own range", () => {
+  for (const kind of Object.keys(eventRules) as MatchEventKind[]) {
+    const event = action("event", kind);
+    const rule = eventRules[kind];
+    for (const value of [rule.min, 0, rule.max]) {
+      const rating = {
+        ...ballot("a", 5),
+        eventAdjustments: [{ eventId: event.id, value }],
+      };
+      assert.equal(
+        adjustedRating(match, rating, [event]).finalScore,
+        5 + value,
+      );
+    }
+    for (const value of [rule.min - 0.01, rule.max + 0.01, NaN, Infinity]) {
+      assert.throws(
+        () =>
+          adjustedRating(
+            match,
+            {
+              ...ballot("a", 5),
+              eventAdjustments: [{ eventId: event.id, value }],
+            },
+            [event],
+          ),
+        /debe estar entre/,
+      );
+    }
+  }
+});
+
+test("sum all actions before clamping once; their order does not change the result", () => {
+  const events = [action("y1", "yellow_card"), action("y2", "yellow_card")];
+  const adjustments = [
+    { eventId: "y1", value: -2 },
+    { eventId: "y2", value: 2 },
+  ];
+  assert.equal(
+    adjustedRating(
+      match,
+      { ...ballot("a", 2), eventAdjustments: adjustments },
+      events,
+    ).finalScore,
+    2,
+  );
+  assert.equal(
+    adjustedRating(
+      match,
+      { ...ballot("a", 2), eventAdjustments: adjustments.toReversed() },
+      events,
+    ).finalScore,
+    2,
+  );
+});
+
+test("clamp each evaluator's final score to 1–10 before the collective average", () => {
+  const events = [action("r1", "red_card")];
+  const ratings = [
+    { ...ballot("a", 9), eventAdjustments: [{ eventId: "r1", value: 3 }] },
+    { ...ballot("b", 1), eventAdjustments: [{ eventId: "r1", value: -3 }] },
+  ];
+  assert.equal(adjustedRating(match, ratings[0], events).finalScore, 10);
+  assert.equal(adjustedRating(match, ratings[1], events).finalScore, 1);
+  assert.equal(matchAverage(match, "a", ratings, events), 5.5);
+});
+
+test("omitted adjustments are neutral; an action alone never creates a rating", () => {
+  const events = [action("y1", "yellow_card")];
+  assert.equal(adjustedRating(match, ballot("a", 7), events).finalScore, 7);
+  assert.equal(matchAverage(match, "a", [], events), null);
+});
+
+test("reject duplicate adjustments, invented actions, other players and other matches", () => {
+  const events = [
+    action("own", "goal"),
+    action("other-player", "goal", "b"),
+    action("other-match", "goal", "a", "m2"),
+  ];
+  for (const eventId of ["missing", "other-player", "other-match"]) {
+    assert.throws(
+      () =>
+        adjustedRating(
+          match,
+          { ...ballot("a", 5), eventAdjustments: [{ eventId, value: 1 }] },
+          events,
+        ),
+      /este jugador y partido/,
+    );
+  }
+  assert.throws(
+    () =>
+      adjustedRating(
+        match,
+        {
+          ...ballot("a", 5),
+          eventAdjustments: [
+            { eventId: "own", value: 1 },
+            { eventId: "own", value: 1 },
+          ],
+        },
+        events,
+      ),
+    /un ajuste/,
+  );
+  assert.throws(
+    () => adjustedRating(match, ballot("absent", 5), events),
+    /participantes/,
+  );
+  assert.throws(
+    () => adjustedRating(match, ballot("a", 11), events),
+    /nota base/,
+  );
+});
+
+test("events require a participating player, unique ID and at most one clean sheet per player", () => {
+  assert.throws(
+    () => validateMatchEvents(match, [action("x", "goal", "absent")]),
+    /participantes/,
+  );
+  assert.throws(
+    () =>
+      validateMatchEvents(match, [action("x", "goal"), action("x", "goal")]),
+    /duplicada/,
+  );
+  assert.throws(
+    () =>
+      validateMatchEvents(match, [
+        action("c1", "clean_sheet"),
+        action("c2", "clean_sheet"),
+      ]),
+    /portería/,
   );
 });

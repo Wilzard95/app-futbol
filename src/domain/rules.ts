@@ -2,9 +2,11 @@ import type {
   Format,
   LineupProposal,
   Match,
+  MatchEvent,
   RatingBallot,
   Slot,
 } from "./types.ts";
+import { adjustedRating, validateMatchEvents } from "./events.ts";
 
 export const formations: Record<Format, { name: string; slots: Slot[] }> = {
   5: {
@@ -57,7 +59,9 @@ export function matchAverage(
   match: Match,
   playerId: string,
   ballots: RatingBallot[],
+  events: MatchEvent[] = [],
 ): number | null {
+  validateMatchEvents(match, events);
   const seen = new Set<string>();
   const scores = ballots
     .filter((ballot) => {
@@ -78,7 +82,7 @@ export function matchAverage(
       seen.add(ballot.authorPlayerId);
       return true;
     })
-    .map((ballot) => ballot.score);
+    .map((ballot) => adjustedRating(match, ballot, events).finalScore);
   return scores.length
     ? scores.reduce((a, b) => a + b, 0) / scores.length
     : null;
@@ -90,10 +94,11 @@ export function tournamentAverage(
   playerId: string,
   matches: Match[],
   ballots: RatingBallot[],
+  events: MatchEvent[] = [],
 ): number | null {
   const values = matches
     .filter((match) => match.tournamentId === tournamentId)
-    .map((match) => matchAverage(match, playerId, ballots))
+    .map((match) => matchAverage(match, playerId, ballots, events))
     .filter((score): score is number => score !== null);
   return values.length
     ? values.reduce((a, b) => a + b, 0) / values.length

@@ -19,9 +19,22 @@ import {
   Vote,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { ballots, matches, players, proposals, tournaments } from "./data/demo";
+import {
+  ballots,
+  matchEvents,
+  matches,
+  players,
+  proposals,
+  tournaments,
+} from "./data/demo";
+import MatchRatingsDemo from "./components/MatchRatingsDemo";
 import { consensus, formations, tournamentAverage } from "./domain/rules";
-import type { Player, Tournament } from "./domain/types";
+import type {
+  MatchEvent,
+  Player,
+  RatingBallot,
+  Tournament,
+} from "./domain/types";
 
 type View = "overview" | "players" | "matches" | "lineup";
 const navigation: { id: View; label: string; icon: LucideIcon }[] = [
@@ -66,10 +79,14 @@ function Pitch({
   tournament,
   proposalId,
   compact = false,
+  ratings,
+  events,
 }: {
   tournament: Tournament;
   proposalId: string;
   compact?: boolean;
+  ratings: RatingBallot[];
+  events: MatchEvent[];
 }) {
   const formation = formations[tournament.format];
   const result = consensus(tournament.id, formation.slots, proposals);
@@ -110,7 +127,8 @@ function Pitch({
                             tournament.id,
                             id,
                             matches,
-                            ballots,
+                            ratings,
+                            events,
                           ),
                         )}
                       </span>
@@ -152,6 +170,8 @@ export default function App() {
   const [view, setView] = useState<View>("overview");
   const [tournamentId, setTournamentId] = useState(tournaments[0].id);
   const [proposalId, setProposalId] = useState("consensus");
+  const [events, setEvents] = useState(matchEvents);
+  const [ratings, setRatings] = useState(ballots);
   const tournament = tournaments.find((item) => item.id === tournamentId)!;
   const tournamentMatches = matches.filter(
     (match) => match.tournamentId === tournamentId,
@@ -159,7 +179,13 @@ export default function App() {
   const ranking = players
     .map((player) => ({
       player,
-      score: tournamentAverage(tournamentId, player.id, matches, ballots),
+      score: tournamentAverage(
+        tournamentId,
+        player.id,
+        matches,
+        ratings,
+        events,
+      ),
     }))
     .sort(
       (a, b) =>
@@ -182,6 +208,19 @@ export default function App() {
   function selectTournament(id: string) {
     setTournamentId(id);
     setProposalId("consensus");
+  }
+
+  function updateEvents(next: MatchEvent[]) {
+    const ids = new Set(next.map((event) => event.id));
+    setEvents(next);
+    setRatings((current) =>
+      current.map((ballot) => ({
+        ...ballot,
+        eventAdjustments: ballot.eventAdjustments?.filter((item) =>
+          ids.has(item.eventId),
+        ),
+      })),
+    );
   }
 
   function ratingsTable(full = false) {
@@ -327,7 +366,9 @@ export default function App() {
             >
               <Icon size={19} />
               {label}
-              {id === "lineup" && <span className="nav-new">{tournament.format}</span>}
+              {id === "lineup" && (
+                <span className="nav-new">{tournament.format}</span>
+              )}
             </button>
           ))}
         </nav>
@@ -346,7 +387,7 @@ export default function App() {
           <CodeXml size={17} /> Ver el proyecto <ArrowUpRight size={14} />
         </a>
         <div className="sidebar-bottom">
-          <span className="version-dot" /> Base del proyecto <span>v0.1</span>
+          <span className="version-dot" /> Base del proyecto <span>v0.2</span>
         </div>
       </aside>
 
@@ -528,6 +569,8 @@ export default function App() {
                       tournament={tournament}
                       proposalId="consensus"
                       compact
+                      ratings={ratings}
+                      events={events}
                     />
                     <button
                       className="lineup-button"
@@ -596,6 +639,15 @@ export default function App() {
                   </p>
                 </div>
               </div>
+              <MatchRatingsDemo
+                key={tournamentId}
+                matches={tournamentMatches}
+                players={players}
+                events={events}
+                ballots={ratings}
+                onEventsChange={updateEvents}
+                onBallotsChange={setRatings}
+              />
             </>
           )}
           {view === "lineup" && (
@@ -626,7 +678,12 @@ export default function App() {
                     </select>
                   </label>
                 </div>
-                <Pitch tournament={tournament} proposalId={proposalId} />
+                <Pitch
+                  tournament={tournament}
+                  proposalId={proposalId}
+                  ratings={ratings}
+                  events={events}
+                />
               </section>
               <div className="lineup-explainer">
                 <span className="eyebrow">ASÍ SE CONSTRUYE</span>

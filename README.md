@@ -8,6 +8,8 @@ Demostración navegable con datos enteramente ficticios. No hay autenticación, 
 
 - Resumen y plantilla con promedios independientes por torneo.
 - Resultados y participantes de muestra.
+- En «Partidos», registro de acciones y valoración interactiva: amarillas −2/+2, rojas −3/+3, goles 0/+1, asistencias 0/+0,5 y porterías en cero 0/+1.
+- Ajustes acumulativos por acción; cada voto final se limita a 1–10 antes de promediar. Cambios temporales reflejados en la plantilla y la titular.
 - Fútbol **6 como modalidad principal**, además de fútbol 5 y 11.
 - Formaciones iniciales 2–2–1, 1–2–1 y 4–3–3, respectivamente, más un arquero.
 - Titular colectiva y propuestas anónimas de ejemplo; empates superpuestos por posición.
@@ -33,9 +35,11 @@ pnpm preview   # servir la compilación existente
 ```text
 src/
   App.tsx              Interfaz de demostración
+  components/MatchRatingsDemo.tsx Registro y valoración de acciones de prueba
   styles.css           Diseño adaptable
   data/demo.ts         Jugadores, partidos y votos ficticios
   domain/types.ts      Contratos iniciales del dominio
+  domain/events.ts     Acciones, rangos, validación y nota final ajustada
   domain/rules.ts      Promedios, participación, formaciones y consenso
   domain/rules.test.ts Pruebas de las reglas propuestas
 docs/
