@@ -1362,13 +1362,16 @@ h1 + p {
     justify-content: space-between;
   }
   .nav-item {
-    padding: 13px 10px;
-    font-size: 10px;
-    gap: 7px;
+    padding: 11px 4px;
+    font-size: 9px;
+    gap: 6px;
+    min-width: 0;
+    flex-direction: column;
     border-radius: 7px 7px 0 0;
     justify-content: center;
     flex: 1;
-    white-space: nowrap;
+    white-space: normal;
+    text-align: center;
   }
   .nav-item svg {
     width: 15px;

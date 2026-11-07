@@ -54,7 +54,7 @@ HTML sigue siendo parte de la aplicación. React ayuda a mantener sincronizados 
 
 Repositorio: [Wilzard95/app-futbol](https://github.com/Wilzard95/app-futbol).
 
-Dirección prevista para Pages: [wilzard95.github.io/app-futbol/](https://wilzard95.github.io/app-futbol/). Su activación depende de que el flujo de despliegue termine correctamente.
+Demo pública: [wilzard95.github.io/app-futbol/](https://wilzard95.github.io/app-futbol/). El primer despliegue terminó correctamente en GitHub Actions.
 
 Cada cambio en `main` ejecuta pruebas, compila y publica `dist/`. Los pull requests solo verifican y compilan. Las decisiones pendientes están en [docs/DECISIONES.md](docs/DECISIONES.md).
 
