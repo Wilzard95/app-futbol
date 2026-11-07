@@ -23,28 +23,32 @@
 - La valoración de las tarjetas depende del contexto y puede premiar o penalizar; no hay una penalización automática.
 - El administrador registra los eventos dentro del partido. Cada participante evalúa esos mismos eventos de forma independiente: un ajuste 0 y otro +0,1 modifican sus respectivas notas antes del promedio.
 - Las vistas de registro del administrador y valoración del jugador deben estar separadas. La nota general la ingresa cada evaluador.
+- Titulares de prueba con varias formaciones. En fútbol 6: 3–2, 3–1–1, 2–2–1 y 2–3, además del arquero.
+- Mostrar cuál es la formación más seleccionada; conservar todos los empates.
 
 ## Propuesta aplicada solo a la demo
 
-| Decisión             | Valor inicial                                          | Estado                                                   |
-| -------------------- | ------------------------------------------------------ | -------------------------------------------------------- |
-| Interfaz             | React + TypeScript + Vite                              | Base creada; se puede cambiar                            |
-| Backend              | Supabase                                               | Recomendado; sin contratar ni conectar                   |
-| Nombre               | La Cancha / app-futbol                                 | Provisional                                              |
-| Plantilla de muestra | Los del Barrio                                         | Completamente ficticia                                   |
-| Formaciones          | F6 2–2–1; F5 1–2–1; F11 4–3–3                          | Propuestas iniciales                                     |
-| Notas                | Base 1 a 10; final limitada a 1–10; vista a un decimal | Escala confirmada; límite final aplicado para mantenerla |
-| Ajustes por acciones | Individuales y acumulativos                            | Rangos y acumulación confirmados                         |
-| Promedio del torneo  | Igual peso para cada partido valorado                  | Pendiente de confirmar                                   |
-| Autoevaluación       | Incluida con el mismo peso                             | Permitida por requisito; peso propuesto                  |
-| Datos                | Ejemplos estáticos; sin persistencia                   | Solo para discutir el proyecto                           |
+| Decisión             | Valor inicial                                                              | Estado                                                   |
+| -------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Interfaz             | React + TypeScript + Vite                                                  | Base creada; se puede cambiar                            |
+| Backend              | Supabase                                                                   | Recomendado; sin contratar ni conectar                   |
+| Nombre               | La Cancha / app-futbol                                                     | Provisional                                              |
+| Plantilla de muestra | Los del Barrio                                                             | Completamente ficticia                                   |
+| Formaciones          | F6: 3–2, 3–1–1, 2–2–1 y 2–3; alternativas F5/F11                           | Opciones F6 solicitadas; F5/F11 de ejemplo               |
+| Voto de formación    | Una propuesta guardada por persona/torneo; cambiarla reemplaza la anterior | Regla aplicada a la prueba                               |
+| Titular colectiva    | Frecuencias de posición solo entre propuestas de la misma formación        | Evita mezclar ubicaciones distintas                      |
+| Notas                | Base 1 a 10; final limitada a 1–10; vista a un decimal                     | Escala confirmada; límite final aplicado para mantenerla |
+| Ajustes por acciones | Individuales y acumulativos                                                | Rangos y acumulación confirmados                         |
+| Promedio del torneo  | Igual peso para cada partido valorado                                      | Pendiente de confirmar                                   |
+| Autoevaluación       | Incluida con el mismo peso                                                 | Permitida por requisito; peso propuesto                  |
+| Datos                | Ejemplos estáticos; sin persistencia                                       | Solo para discutir el proyecto                           |
 
 ## Por acordar antes de conectar cuentas reales
 
 1. **Publicación de resultados.** Se recomienda después del cierre, con al menos tres evaluadores por jugador. ¿Tiempo fijo, por ejemplo 48 horas, o cierre manual? Debe evitarse observar cambios voto a voto.
 2. **Promedio.** La escala 1–10 y los rangos por acción están confirmados. Se limita cada voto final a 1–10 antes de promediar. Confirmar peso igual por partido y peso de la autoevaluación; la demo permite décimas en los controles.
-3. **Vinculación.** Correo preasignado a la ficha o solicitud aprobada por administrador. Un enlace abierto no debe permitir apropiarse libremente de cualquier jugador.
-4. **Titular y conflictos.** Confirmar formaciones; decidir qué hacer si una persona gana en varias posiciones. El criterio solicitado de frecuencia local puede generar ese resultado.
+3. **Cuentas y vinculación.** Se recomienda Google y correo con contraseña, con solicitud de ficha pendiente de aprobación por administrador. El administrador puede desvincular o expulsar del equipo sin borrar la cuenta global. Es una propuesta sin activar; ver `CUENTAS.md`.
+4. **Titular y conflictos.** Las cuatro opciones F6 ya están incluidas. Decidir qué hacer si una persona gana en varias posiciones dentro de una titular colectiva. El criterio solicitado de frecuencia local puede generar ese resultado.
 5. **Quién puede proponer la titular.** Se recomienda cualquier jugador activo vinculado del equipo, aunque no haya participado en el último partido. Entrenadores sin ficha, por definir.
 6. **Comentarios y reacciones.** ¿Visibles para todo el equipo o solo para el destinatario? Propuesta inicial: comentario opcional, máximo 500 caracteres, una reacción 👍 o 👎 por valoración. Definir cómo reportar y moderar sin exponer autoría.
 7. **Edición.** Se recomienda poder cambiar el voto y la propuesta hasta el cierre, manteniendo un solo envío activo. Evitar borrar históricos al retirar jugadores o torneos.
@@ -57,5 +61,7 @@ La demo separa «Administrador» y «Jugador». La primera vista permite crear u
 El promedio del partido se muestra con dos decimales: dos notas generales de 7 con ajustes 0 y +0,1 dan 7 y 7,1 finales, y 7,05 de promedio. La plantilla y la titular conservan un decimal de presentación, sin redondeos intermedios en el motor.
 
 Los partidos, eventos y valoraciones de prueba viven en memoria y se pierden al recargar. El selector de roles/sesiones es una herramienta de demostración, sin autenticación ni autorización reales. Retirar un evento elimina sus ajustes de las valoraciones de prueba; en la versión conectada habrá que impedir cambios tras el cierre o reabrir la votación.
+
+La titular permite elegir formación, seleccionar jugadores tocando posiciones de la cancha y guardar una propuesta completa sin repetir jugadores. Se simulan dos cuentas para comprobar reemplazos e independencia. El conteo excluye borradores; una propuesta editada conserva un solo voto. La votación presenta todas las formaciones líderes, los porcentajes sobre el total del torneo, las titulares colectivas por formación y las propuestas individuales sin autores. La tarjeta del resumen se actualiza con los mismos datos.
 
 Revisar las decisiones anteriores, crear el proyecto backend y su correo de autenticación, aplicar migraciones y políticas de acceso, y comprobar con varias cuentas que ni el administrador puede consultar autores. Hasta entonces solo se usan ejemplos ficticios.

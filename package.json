@@ -1,7 +1,7 @@
 {
   "name": "app-futbol",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "packageManager": "pnpm@11.25.0",
   "engines": {
@@ -11,7 +11,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node --test src/domain/rules.test.ts",
+    "test": "node --test src/domain/*.test.ts",
     "check": "pnpm test && pnpm build"
   },
   "dependencies": {

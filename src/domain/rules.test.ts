@@ -1,12 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  canRate,
-  consensus,
-  formations,
-  matchAverage,
-  tournamentAverage,
-} from "./rules.ts";
+import { canRate, matchAverage, tournamentAverage } from "./rules.ts";
 import type {
   Match,
   MatchEvent,
@@ -66,45 +60,6 @@ test("duplicate votes are rejected instead of inflating the average", () => {
     /duplicada/,
   );
 });
-test("formations include exactly one keeper and the correct number of players", () => {
-  for (const format of [5, 6, 11] as const) {
-    assert.equal(formations[format].slots.length, format);
-    assert.equal(
-      formations[format].slots.filter((slot) => slot.id === "gk").length,
-      1,
-    );
-  }
-});
-test("consensus preserves ties, isolates tournaments and reports cross-slot conflicts", () => {
-  const slots = formations[5].slots.slice(0, 2);
-  const result = consensus("t1", slots, [
-    { id: "1", tournamentId: "t1", picks: { gk: "a", cb: "b" } },
-    { id: "2", tournamentId: "t1", picks: { gk: "b", cb: "a" } },
-    { id: "3", tournamentId: "other", picks: { gk: "z", cb: "x" } },
-  ]);
-  assert.deepEqual(result.positions[0].winners, ["a", "b"]);
-  assert.equal(result.proposalCount, 2);
-  assert.deepEqual(result.conflicts.sort(), ["a", "b"]);
-  assert.equal(consensus("empty", slots, []).positions[0].votes, 0);
-});
-test("a proposal cannot repeat a player or omit a position", () => {
-  const slots = formations[5].slots.slice(0, 2);
-  assert.throws(
-    () =>
-      consensus("t1", slots, [
-        { id: "1", tournamentId: "t1", picks: { gk: "a", cb: "a" } },
-      ]),
-    /sin repetir/,
-  );
-  assert.throws(
-    () =>
-      consensus("t1", slots, [
-        { id: "1", tournamentId: "t1", picks: { gk: "a" } },
-      ]),
-    /completar/,
-  );
-});
-
 const action = (
   id: string,
   kind: MatchEventKind,

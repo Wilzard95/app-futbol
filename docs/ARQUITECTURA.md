@@ -4,15 +4,15 @@ Estado: base de frontend implementada; backend propuesto, pendiente de acordar r
 
 ## Componentes
 
-| Componente               | Elección propuesta                                 | Función                                                  |
-| ------------------------ | -------------------------------------------------- | -------------------------------------------------------- |
-| Interfaz                 | React + TypeScript                                 | Vistas, formularios, cancha y estados                    |
-| Desarrollo y compilación | Vite                                               | Generar archivos estáticos portables                     |
-| Alojamiento inicial      | GitHub Pages                                       | Servir la interfaz por HTTPS                             |
-| Identidad                | Supabase Auth                                      | Correo verificado, sesiones, enlace o código de acceso   |
-| Datos                    | PostgreSQL de Supabase                             | Equipos, torneos, participación e históricos             |
-| Autorización             | RLS y funciones transaccionales                    | Comprobar permisos y limitar qué devuelve cada operación |
-| Operaciones sensibles    | Funciones SQL/RPC y, si hace falta, Edge Functions | Invitaciones, vinculación, votos y resultados anónimos   |
+| Componente               | Elección propuesta                                 | Función                                                                         |
+| ------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Interfaz                 | React + TypeScript                                 | Vistas, formularios, cancha y estados                                           |
+| Desarrollo y compilación | Vite                                               | Generar archivos estáticos portables                                            |
+| Alojamiento inicial      | GitHub Pages                                       | Servir la interfaz por HTTPS                                                    |
+| Identidad                | Supabase Auth                                      | Propuesta: Google y correo con contraseña/verificación; sesiones y recuperación |
+| Datos                    | PostgreSQL de Supabase                             | Equipos, torneos, participación e históricos                                    |
+| Autorización             | RLS y funciones transaccionales                    | Comprobar permisos y limitar qué devuelve cada operación                        |
+| Operaciones sensibles    | Funciones SQL/RPC y, si hace falta, Edge Functions | Invitaciones, vinculación, votos y resultados anónimos                          |
 
 No hace falta un servidor dedicado ni Next.js para este alcance. La interfaz podrá mudarse de alojamiento sin rediseñar el modelo de datos. Una PWA instalable se puede añadir después; la primera entrega es una web adaptable y conectada a internet. No se propone soporte sin conexión para enviar votos.
 
@@ -50,14 +50,14 @@ Los tokens no se guardan en el repositorio ni en registros de analítica. No se 
 | `memberships` / `membership_roles` | Usuario y equipo únicos; roles acumulables                                                                              |
 | `players`                          | Ficha del equipo; vínculo opcional y único con una membresía                                                            |
 | `invitations` / `player_claims`    | Token hash, destinatario opcional, vencimiento, consumo y aprobación                                                    |
-| `tournaments`                      | Equipo, modalidad 5/6/11, temporada y formación configurada                                                             |
+| `tournaments`                      | Equipo, modalidad 5/6/11, temporada y formaciones habilitadas                                                           |
 | `matches`                          | Torneo, rival, fecha, resultado y ventana de valoración                                                                 |
 | `match_participants`               | Partido y jugador únicos; ambos del mismo equipo                                                                        |
 | `match_events`                     | Acción registrada por administrador, partido, participante, tipo y contexto; una portería en cero por jugador y partido |
 | `private.rating_ballots`           | Partido, autor y destinatario únicos; nota validada; autor privado                                                      |
 | `private.rating_event_adjustments` | Voto y acción únicos; ajuste dentro del rango del tipo de acción; misma persona y partido del voto                      |
 | `private.feedback`                 | Comentario y reacción vinculados al voto; nunca devuelve el autor                                                       |
-| `private.lineup_proposals`         | Una propuesta activa por jugador y torneo; autor privado                                                                |
+| `private.lineup_proposals`         | Una propuesta activa por jugador y torneo; formación elegida y autor privado                                            |
 | `private.lineup_picks`             | Posición y jugador de cada propuesta; sin repetir jugadores                                                             |
 
 El esquema `private` no se expone a la API de datos del navegador. El modelo exacto se convertirá en migraciones SQL después de cerrar las decisiones. Los tipos TypeScript de esta demo son un contrato inicial, no un sustituto de las restricciones de PostgreSQL.
@@ -129,14 +129,23 @@ Las reglas se pueden probar en `src/domain/rules.test.ts`. En la app real el cá
 
 ## Titulares colectivas
 
-- Fútbol 6: un arquero y cinco jugadores de campo. Formación inicial 2–2–1.
-- Fútbol 5: un arquero y cuatro de campo. Formación inicial 1–2–1.
-- Fútbol 11: un arquero y diez de campo. Formación inicial 4–3–3.
-- La formación define posiciones estables dentro de cada torneo. Cada propuesta completa esas posiciones sin repetir jugadores.
+- Fútbol 6: un arquero y cinco jugadores de campo. Opciones solicitadas: 3–2, 3–1–1, 2–2–1 y 2–3.
+- Fútbol 5: un arquero y cuatro de campo. Opciones de prueba: 1–2–1, 2–2 y 1–3.
+- Fútbol 11: un arquero y diez de campo. Opciones de prueba: 4–3–3, 4–4–2, 3–5–2 y 4–2–3–1.
+- Cada formación define sus posiciones estables. Cada propuesta elige una formación y completa sus posiciones sin repetir jugadores ni incluir personas ajenas al equipo.
+- Solo se cuentan propuestas completas guardadas. Hay una por persona y torneo; editar o cambiar de formación reemplaza la anterior y conserva su identificador anónimo.
+- El conteo de formación presenta votos y porcentaje sobre el total de propuestas del torneo. En un empate se destacan todas las formaciones líderes. La formación que se muestra en cancha es una selección de visualización, sin desempate automático.
+- El consenso por posición se calcula exclusivamente entre las propuestas de esa formación. No se mezclan puestos de un 3–2 con los de un 2–2–1.
 - Se cuenta la frecuencia de cada jugador en cada posición. Todos los máximos empatados se muestran superpuestos, como se solicitó.
 - La nota sobre el icono es su promedio del torneo, no una media de votos de alineación.
 - Se muestran propuestas individuales sin identificar a sus autores.
 - Si un jugador gana en dos posiciones, el algoritmo actual lo detecta. Resolverlo exige acordar una regla; una asignación global sin repeticiones podría cambiar al ganador de una posición. No se impondrá ese cambio sin decidirlo.
+
+El editor ofrece posiciones pulsables, un selector de jugador que deshabilita a quienes ya están ubicados y una plantilla ficticia para completar rápidamente. El cálculo vuelve a validar la propuesta al guardar. Las sesiones simuladas de Mateo y Andrés empiezan sin propuesta, mientras otras cuatro propuestas ficticias permiten explorar la votación. Los datos solo viven en memoria.
+
+Las identidades se usan internamente para limitar un voto por persona. La función de presentación elimina el campo de autor de las propuestas anónimas; en producción esa eliminación y el control de acceso ocurrirán en el servidor. Las pruebas cubren conteos, reemplazos, empates, mezcla de torneos/modalidades, plantillas incompletas y posiciones de diferentes formaciones.
+
+La propuesta de cuentas, aprobación de fichas y desvinculación administrativa se detalla en [CUENTAS.md](CUENTAS.md); no está conectada a servicios reales en esta demo.
 
 ## Primera versión conectada
 

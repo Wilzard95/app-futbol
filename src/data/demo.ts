@@ -1,4 +1,8 @@
-import { formations } from "../domain/rules";
+import {
+  defaultFormationIds,
+  formationCatalog,
+  getFormation,
+} from "../domain/lineups";
 import type {
   LineupProposal,
   Match,
@@ -259,21 +263,28 @@ export const ballots: RatingBallot[] = matches.flatMap((match, matchIndex) =>
 );
 
 export const proposals: LineupProposal[] = tournaments.flatMap((tournament) => {
-  const formation = formations[tournament.format];
-  const ids =
-    tournament.format === 5
-      ? ["p1", "p2", "p4", "p5", "p6"]
-      : players.slice(0, tournament.format).map((player) => player.id);
-  return Array.from({ length: 4 }, (_, index) => ({
-    id: `${tournament.id}-${index}`,
-    tournamentId: tournament.id,
-    picks: Object.fromEntries(
-      formation.slots.map((slot, slotIndex) => [
-        slot.id,
-        tournament.format === 6 && slot.id === "st" && index >= 2
-          ? "p7"
-          : ids[slotIndex],
-      ]),
-    ),
-  }));
+  const initial = defaultFormationIds[tournament.format];
+  const choices =
+    tournament.format === 6
+      ? [initial, initial, "f6-3-2", "f6-3-1-1"]
+      : [
+          initial,
+          initial,
+          formationCatalog[tournament.format][1].id,
+          formationCatalog[tournament.format][2].id,
+        ];
+  return choices.map((formationId, index) => {
+    const selected = getFormation(tournament.format, formationId);
+    const ids = players.slice(0, tournament.format).map((player) => player.id);
+    if (tournament.format === 6 && index === 1) ids[5] = "p7";
+    return {
+      id: `${tournament.id}-${index}`,
+      tournamentId: tournament.id,
+      authorPlayerId: `p${index + 3}`,
+      formationId,
+      picks: Object.fromEntries(
+        selected.slots.map((slot, slotIndex) => [slot.id, ids[slotIndex]]),
+      ),
+    };
+  });
 });

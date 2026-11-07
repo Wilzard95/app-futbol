@@ -13,7 +13,8 @@ Demostración navegable con datos enteramente ficticios. No hay autenticación, 
 - Dos sesiones simuladas permiten probar opiniones independientes; empiezan sin nota general precargada. El promedio del partido muestra dos decimales para apreciar ajustes pequeños como +0,1.
 - Ajustes acumulativos por acción; cada voto final se limita a 1–10 antes de promediar. Cambios temporales reflejados en la plantilla y la titular.
 - Fútbol **6 como modalidad principal**, además de fútbol 5 y 11.
-- Formaciones iniciales 2–2–1, 1–2–1 y 4–3–3, respectivamente, más un arquero.
+- Titular editable por torneo: fútbol 6 ofrece 3–2, 3–1–1, 2–2–1 y 2–3, siempre más un arquero. También hay alternativas para fútbol 5 y 11.
+- Votos y porcentajes por formación, con todos los líderes empatados. Guardar otra formación reemplaza la propuesta anterior de esa persona.
 - Titular colectiva y propuestas anónimas de ejemplo; empates superpuestos por posición.
 - Detección de conflictos si alguien resulta elegido en varias posiciones.
 - Diseño adaptable a teléfonos y escritorio.
@@ -39,16 +40,21 @@ src/
   App.tsx              Interfaz de demostración
   components/MatchRatingsDemo.tsx Registro y valoración de acciones de prueba
   components/MatchCreateForm.tsx Alta de partidos y participantes en memoria
+  components/LineupLab.tsx      Editor de titulares, votación y propuestas anónimas
+  components/LineupPitch.tsx    Cancha editable y colectiva
   styles.css           Diseño adaptable
   data/demo.ts         Jugadores, partidos y votos ficticios
   domain/types.ts      Contratos iniciales del dominio
   domain/events.ts     Acciones, rangos, validación y nota final ajustada
   domain/rules.ts      Promedios, participación, formaciones y consenso
   domain/rules.test.ts Pruebas de las reglas propuestas
+  domain/lineups.ts    Formaciones, votos, validación y consenso por formación
+  domain/lineups.test.ts Pruebas de propuestas y votos de formaciones
 docs/
   ARQUITECTURA.md      Propuesta de frontend, backend, permisos e identidad
   DECISIONES.md        Requisitos confirmados y reglas pendientes
   DESPLIEGUE.md        GitHub Pages y desarrollo local
+  CUENTAS.md          Propuesta de Google/correo, solicitud de ficha y administración
 ```
 
 ## Tecnología

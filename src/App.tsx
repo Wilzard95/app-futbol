@@ -4,7 +4,6 @@ import {
   ArrowUpRight,
   ArrowRight,
   CalendarDays,
-  Check,
   ChevronDown,
   CircleHelp,
   ClipboardList,
@@ -24,18 +23,13 @@ import {
   matchEvents,
   matches as demoMatches,
   players,
-  proposals,
+  proposals as demoProposals,
   tournaments,
 } from "./data/demo";
 import MatchRatingsDemo from "./components/MatchRatingsDemo";
-import { consensus, formations, tournamentAverage } from "./domain/rules";
-import type {
-  Match,
-  MatchEvent,
-  Player,
-  RatingBallot,
-  Tournament,
-} from "./domain/types";
+import LineupLab, { LineupOverview } from "./components/LineupLab";
+import { tournamentAverage } from "./domain/rules";
+import type { MatchEvent, Player } from "./domain/types";
 
 type View = "overview" | "players" | "matches" | "lineup";
 const navigation: { id: View; label: string; icon: LucideIcon }[] = [
@@ -76,103 +70,10 @@ function PlayerAvatar({
   );
 }
 
-function Pitch({
-  tournament,
-  proposalId,
-  compact = false,
-  ratings,
-  events,
-  matches,
-}: {
-  tournament: Tournament;
-  proposalId: string;
-  compact?: boolean;
-  ratings: RatingBallot[];
-  events: MatchEvent[];
-  matches: Match[];
-}) {
-  const formation = formations[tournament.format];
-  const result = consensus(tournament.id, formation.slots, proposals);
-  const proposal = proposals.find((item) => item.id === proposalId);
-  return (
-    <div className={`pitch-wrap ${compact ? "compact" : ""}`}>
-      <div className="pitch-caption">
-        <span>
-          <span className="live-dot" />{" "}
-          {proposal ? "Propuesta anónima" : "La elección del equipo"}
-        </span>
-        <span>{formation.name}</span>
-      </div>
-      <div
-        className={`pitch pitch-${tournament.format}`}
-        aria-label={`Alineación de fútbol ${tournament.format}`}
-      >
-        <div className="pitch-boundary" />
-        <div className="halfway" />
-        <div className="center-circle" />
-        <div className="penalty top" />
-        <div className="penalty bottom" />
-        {result.positions.map((slot) => (
-          <div
-            className="position"
-            key={slot.id}
-            style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
-          >
-            <div className="stack">
-              {(proposal ? [proposal.picks[slot.id]] : slot.winners).map(
-                (id) => {
-                  const player = players.find((item) => item.id === id)!;
-                  return (
-                    <div className="pitch-player" key={id}>
-                      <span className="pitch-rating">
-                        {scoreLabel(
-                          tournamentAverage(
-                            tournament.id,
-                            id,
-                            matches,
-                            ratings,
-                            events,
-                          ),
-                        )}
-                      </span>
-                      <span className="shirt">{player.number}</span>
-                      <span className="pitch-name">
-                        {player.name.split(" ")[0]}
-                      </span>
-                    </div>
-                  );
-                },
-              )}
-            </div>
-            <span className="position-label">
-              {slot.label}
-              {!proposal && slot.winners.length > 1 ? " · EMPATE" : ""}
-            </span>
-          </div>
-        ))}
-      </div>
-      <div className="pitch-footer">
-        <Users size={14} />
-        <span>
-          {proposal
-            ? "Identidad del autor oculta"
-            : `${result.proposalCount} propuestas de muestra · empates superpuestos`}
-        </span>
-      </div>
-      {result.conflicts.length > 0 && !proposal && (
-        <p className="conflict">
-          Hay jugadores elegidos en varias posiciones. Falta acordar cómo
-          resolverlo.
-        </p>
-      )}
-    </div>
-  );
-}
-
 export default function App() {
   const [view, setView] = useState<View>("overview");
   const [tournamentId, setTournamentId] = useState(tournaments[0].id);
-  const [proposalId, setProposalId] = useState("consensus");
+  const [lineups, setLineups] = useState(demoProposals);
   const [events, setEvents] = useState(matchEvents);
   const [ratings, setRatings] = useState(ballots);
   const [matches, setMatches] = useState(demoMatches);
@@ -197,6 +98,9 @@ export default function App() {
         a.player.name.localeCompare(b.player.name),
     );
   const ratedPlayers = ranking.filter((item) => item.score !== null);
+  const playerAverages = Object.fromEntries(
+    ranking.map(({ player, score }) => [player.id, score]),
+  );
   const wins = tournamentMatches.filter(
     (match) => match.goalsFor > match.goalsAgainst,
   ).length;
@@ -211,7 +115,6 @@ export default function App() {
 
   function selectTournament(id: string) {
     setTournamentId(id);
-    setProposalId("consensus");
   }
 
   function updateEvents(next: MatchEvent[]) {
@@ -391,7 +294,7 @@ export default function App() {
           <CodeXml size={17} /> Ver el proyecto <ArrowUpRight size={14} />
         </a>
         <div className="sidebar-bottom">
-          <span className="version-dot" /> Base del proyecto <span>v0.3</span>
+          <span className="version-dot" /> Base del proyecto <span>v0.4</span>
         </div>
       </aside>
 
@@ -565,17 +468,15 @@ export default function App() {
                     <div className="section-heading">
                       <div>
                         <h2>Titular colectiva</h2>
-                        <p>Los más elegidos, posición por posición.</p>
+                        <p>La formación y los jugadores más elegidos.</p>
                       </div>
                       <Vote size={20} />
                     </div>
-                    <Pitch
+                    <LineupOverview
                       tournament={tournament}
-                      proposalId="consensus"
-                      compact
-                      ratings={ratings}
-                      events={events}
-                      matches={matches}
+                      players={players}
+                      averages={playerAverages}
+                      proposals={lineups}
                     />
                     <button
                       className="lineup-button"
@@ -661,88 +562,14 @@ export default function App() {
             </>
           )}
           {view === "lineup" && (
-            <div className="lineup-layout">
-              <section className="panel full-pitch">
-                <div className="section-heading">
-                  <div>
-                    <h2>{tournament.name}</h2>
-                    <p>
-                      Fútbol {tournament.format} ·{" "}
-                      {formations[tournament.format].name}
-                    </p>
-                  </div>
-                  <label className="proposal-select">
-                    <span className="sr-only">Propuesta a visualizar</span>
-                    <select
-                      value={proposalId}
-                      onChange={(event) => setProposalId(event.target.value)}
-                    >
-                      <option value="consensus">Titular colectiva</option>
-                      {proposals
-                        .filter((item) => item.tournamentId === tournamentId)
-                        .map((item, index) => (
-                          <option key={item.id} value={item.id}>
-                            Propuesta anónima {index + 1}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
-                </div>
-                <Pitch
-                  tournament={tournament}
-                  proposalId={proposalId}
-                  ratings={ratings}
-                  events={events}
-                  matches={matches}
-                />
-              </section>
-              <div className="lineup-explainer">
-                <span className="eyebrow">ASÍ SE CONSTRUYE</span>
-                <h2>
-                  Tu idea del equipo
-                  <br />
-                  también tiene lugar.
-                </h2>
-                <div className="explanation-step">
-                  <span>01</span>
-                  <div>
-                    <strong>Una propuesta por persona</strong>
-                    <p>
-                      Todos los jugadores vinculados podrán elegir su titular
-                      del torneo. Sin nombres de autores.
-                    </p>
-                  </div>
-                </div>
-                <div className="explanation-step">
-                  <span>02</span>
-                  <div>
-                    <strong>Cuenta cada posición</strong>
-                    <p>
-                      Gana quien aparezca más veces en esa ubicación. En un
-                      empate, aparecen todos superpuestos.
-                    </p>
-                  </div>
-                </div>
-                <div className="explanation-step">
-                  <span>03</span>
-                  <div>
-                    <strong>La nota viaja con el jugador</strong>
-                    <p>
-                      Sobre cada camiseta se muestra su promedio de este torneo,
-                      incluyendo su autoevaluación.
-                    </p>
-                  </div>
-                </div>
-                <div className="demo-notice">
-                  <Check size={18} />
-                  <p>
-                    Puedes cambiar de torneo y explorar las propuestas. La
-                    creación y el guardado se implementarán tras acordar las
-                    reglas.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <LineupLab
+              key={tournamentId}
+              tournament={tournament}
+              players={players}
+              averages={playerAverages}
+              proposals={lineups}
+              onProposalsChange={setLineups}
+            />
           )}
 
           <footer className="page-footer">

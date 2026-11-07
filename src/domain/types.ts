@@ -73,8 +73,20 @@ export interface Slot {
   y: number;
 }
 
+export interface Formation {
+  id: string;
+  format: Format;
+  name: string;
+  slots: Slot[];
+}
+
 export interface LineupProposal {
   id: string;
   tournamentId: string;
+  // Private input in production; never returned with anonymous proposals.
+  authorPlayerId: string;
+  formationId: string;
   picks: Record<string, string>;
 }
+
+export type AnonymousLineupProposal = Omit<LineupProposal, "authorPlayerId">;
