@@ -1,10 +1,23 @@
 # App Fútbol · La Cancha
 
-Base de una aplicación web para equipos de amigos: torneos, partidos, jugadores, valoraciones anónimas y titulares colectivas. **La Cancha** y **Los del Barrio** son nombres provisionales.
+Base de una aplicación web para equipos de amigos: torneos, partidos, jugadores, valoraciones anónimas y titulares colectivas. La app se llama provisionalmente **La Cancha** y el equipo de prueba es **combo del Inge**.
 
 ## Estado de esta versión
 
-Demostración navegable con datos enteramente ficticios. No hay autenticación, servidor, persistencia, invitaciones reales ni envío de votos. Las propuestas que se ven son ejemplos precargados; recargar vuelve al estado inicial.
+Demostración navegable con el equipo y la plantilla indicados por el usuario. Los partidos, eventos, cuentas y votos son simulados. No hay autenticación, servidor, persistencia, invitaciones reales ni envío de votos. Las propuestas que se ven son ejemplos precargados; recargar vuelve al estado inicial.
+
+| Jugador         | Dorsal | Posición  |
+| --------------- | ------ | --------- |
+| William Mendoza | 09     | Delantero |
+| Checho          | 7      | Volante   |
+| Diego Segura    | 23     | Portero   |
+| Fabian VARGAS   | 11     | Defensa   |
+| SEBAS           | 13     | Volante   |
+| Wilson Gómez    | 06     | Defensa   |
+| Ricky           | 5      | Delantero |
+| Chris           | 10     | Volante   |
+
+La plantilla tiene ocho jugadores. Las formaciones de fútbol 11 mantienen tres vacantes y no permiten guardar una titular incompleta. El autocompletado usa a Diego como portero y prioriza las posiciones indicadas.
 
 - Resumen y plantilla con promedios independientes por torneo.
 - Resultados y participantes de muestra.
@@ -43,7 +56,7 @@ src/
   components/LineupLab.tsx      Editor de titulares, votación y propuestas anónimas
   components/LineupPitch.tsx    Cancha editable y colectiva
   styles.css           Diseño adaptable
-  data/demo.ts         Jugadores, partidos y votos ficticios
+  data/demo.ts         Plantilla indicada y datos de prueba simulados
   domain/types.ts      Contratos iniciales del dominio
   domain/events.ts     Acciones, rangos, validación y nota final ajustada
   domain/rules.ts      Promedios, participación, formaciones y consenso

@@ -140,10 +140,10 @@ export default function MatchRatingsDemo(props: Props) {
         <PlayerRatingView key={match.id} {...props} match={match} />
       )}
       <div className="panel-footnote">
-        Demostración con datos ficticios: el selector de vista simula los dos
-        roles. Los cambios se reflejan en el resumen y la titular durante esta
-        sesión y se pierden al recargar. El acceso por cuentas, los permisos y
-        el guardado privado requieren el backend.
+        Partidos, eventos y valoraciones simulados: el selector de vista simula
+        los dos roles. Los cambios se reflejan en el resumen y la titular
+        durante esta sesión y se pierden al recargar. El acceso por cuentas, los
+        permisos y el guardado privado requieren el backend.
       </div>
     </section>
   );

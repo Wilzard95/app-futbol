@@ -3,6 +3,7 @@ import type {
   Format,
   Formation,
   LineupProposal,
+  Player,
 } from "./types.ts";
 
 function formation(format: Format, lines: number[]): Formation {
@@ -74,6 +75,41 @@ export function getFormation(format: Format, id: string): Formation {
   if (!result)
     throw new Error("La formación no corresponde a la modalidad del torneo.");
   return result;
+}
+
+// Use existing players only. Incomplete rosters keep explicit empty positions.
+export function suggestLineup(
+  selected: Formation,
+  players: Player[],
+): Record<string, string> {
+  const picks = Object.fromEntries(selected.slots.map((slot) => [slot.id, ""]));
+  const used = new Set<string>();
+  const roles: Record<string, string[]> = {
+    ARQ: ["portero", "arquero"],
+    DEF: ["defensa"],
+    MED: ["volante", "mediocampo"],
+    DEL: ["delantero"],
+  };
+  for (const slot of selected.slots) {
+    const expected = roles[slot.label.split(" ")[0]];
+    const player = players.find(
+      (item) =>
+        !used.has(item.id) && expected.includes(item.position.toLowerCase()),
+    );
+    if (player) {
+      picks[slot.id] = player.id;
+      used.add(player.id);
+    }
+  }
+  for (const slot of selected.slots) {
+    if (picks[slot.id]) continue;
+    const player = players.find((item) => !used.has(item.id));
+    if (player) {
+      picks[slot.id] = player.id;
+      used.add(player.id);
+    }
+  }
+  return picks;
 }
 
 export function validateLineup(

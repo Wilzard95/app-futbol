@@ -1,6 +1,6 @@
 # Propuesta de cuentas y vinculación
 
-Estado: recomendación técnica en respuesta a la consulta del usuario; pendiente de elegir y conectar el backend. La demo solo simula sesiones con datos ficticios. No hay botones de acceso real ni credenciales configuradas.
+Estado: recomendación técnica en respuesta a la consulta del usuario; pendiente de elegir y conectar el backend. La demo usa la plantilla indicada para combo del Inge y simula las sesiones, partidos y votos. No hay botones de acceso real ni credenciales configuradas.
 
 ## Formas de entrar recomendadas
 

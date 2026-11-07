@@ -14,7 +14,8 @@ export interface Membership {
 export interface Player {
   id: string;
   name: string;
-  number: number;
+  // Shirt numbers are labels: preserve values such as "09" and "06".
+  number: string;
   position: string;
   linked: boolean;
 }

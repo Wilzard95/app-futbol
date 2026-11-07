@@ -23,6 +23,7 @@ import {
   matchEvents,
   matches as demoMatches,
   players,
+  teamName,
   proposals as demoProposals,
   tournaments,
 } from "./data/demo";
@@ -62,7 +63,7 @@ function PlayerAvatar({
 }) {
   return (
     <span
-      className={`avatar ${small ? "small" : ""} tone-${player.number % 4}`}
+      className={`avatar ${small ? "small" : ""} tone-${Number(player.number) % 4}`}
       aria-hidden="true"
     >
       {initials(player.name)}
@@ -177,7 +178,7 @@ export default function App() {
                     <span
                       className={`account-status ${player.linked ? "linked" : ""}`}
                     >
-                      {player.linked ? "Vinculada" : "Por vincular"}
+                      {player.linked ? "Simulada" : "Por vincular"}
                     </span>
                   </td>
                 )}
@@ -258,8 +259,8 @@ export default function App() {
             <Shield size={24} />
           </span>
           <div>
-            <strong>Los del Barrio</strong>
-            <span>Equipo de muestra</span>
+            <strong>{teamName}</strong>
+            <span>Plantilla de prueba</span>
           </div>
         </div>
         <span className="nav-heading">VESTUARIO</span>
@@ -301,7 +302,7 @@ export default function App() {
       <div className="workspace">
         <header className="topbar">
           <div className="breadcrumb">
-            Los del Barrio <span>/</span> <strong>{activeNav.label}</strong>
+            {teamName} <span>/</span> <strong>{activeNav.label}</strong>
           </div>
           <span className="demo-pill">
             <span /> DEMOSTRACIÓN
@@ -513,8 +514,9 @@ export default function App() {
               </div>
               {ratingsTable(true)}
               <div className="panel-footnote">
-                Las cuentas y las vinculaciones mostradas son ficticias. El alta
-                de jugadores llegará con el backend.
+                Los jugadores corresponden a la plantilla indicada. Las cuentas
+                y vinculaciones son simuladas; el acceso real requiere el
+                backend.
               </div>
             </section>
           )}
@@ -577,7 +579,7 @@ export default function App() {
               LA CANCHA <span>·</span> Hecho para jugar en equipo.
             </span>
             <span>
-              Datos ficticios · Sin cuentas ni votos reales en esta versión
+              Partidos, eventos y votos simulados · Sin cuentas reales
             </span>
           </footer>
         </main>

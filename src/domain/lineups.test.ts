@@ -7,10 +7,11 @@ import {
   formationVoting,
   getFormation,
   lineupConsensus,
+  suggestLineup,
   upsertLineup,
   validateLineup,
 } from "./lineups.ts";
-import type { LineupProposal } from "./types.ts";
+import type { LineupProposal, Player } from "./types.ts";
 
 const roster = Array.from({ length: 12 }, (_, index) => `p${index + 1}`);
 const voters = roster.slice(0, 10);
@@ -210,4 +211,45 @@ test("anonymous proposals omit author identity and do not share mutable picks", 
   assert.equal("authorPlayerId" in result[0], false);
   result[0].picks.gk = "p12";
   assert.equal(original.picks.gk, "p1");
+});
+
+test("suggestions put the supplied keeper in goal and leave vacancies instead of inventing players", () => {
+  const positions = [
+    "Delantero",
+    "Volante",
+    "Portero",
+    "Defensa",
+    "Volante",
+    "Defensa",
+    "Delantero",
+    "Volante",
+  ];
+  const players: Player[] = positions.map((position, index) => ({
+    id: roster[index],
+    name: `Jugador ${index + 1}`,
+    number: String(index + 1),
+    position,
+    linked: true,
+  }));
+  const complete = suggestLineup(selected, players);
+  assert.equal(complete.gk, "p3");
+  assert.equal(
+    validateLineup(
+      { ...proposal("a", "p1"), picks: complete },
+      6,
+      players.map((player) => player.id),
+      voters,
+    ).format,
+    6,
+  );
+  const eleven = suggestLineup(
+    getFormation(11, defaultFormationIds[11]),
+    players,
+  );
+  const assigned = Object.values(eleven).filter(Boolean);
+  assert.equal(eleven.gk, "p3");
+  assert.equal(assigned.length, 8);
+  assert.equal(new Set(assigned).size, 8);
+  assert.equal(Object.values(eleven).filter((id) => !id).length, 3);
+  assert.ok(assigned.every((id) => players.some((player) => player.id === id)));
 });

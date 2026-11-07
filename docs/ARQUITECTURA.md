@@ -107,7 +107,7 @@ Cada acción tiene un identificador independiente. Dos goles permiten dos ajuste
 
 Ejemplo: base 7 + gol 1 + asistencia 0,5 − amarilla 2 = 6,5. Base 9 + roja 3 = 12 en bruto y 10 final. Primero se limita cada valoración y después se promedian: dos notas finales 10 y 1 dan 5,5.
 
-Ejemplo confirmado de independencia: el administrador registra una amarilla para Daniel. Un evaluador ingresa nota general 7 y ajuste 0: su nota final es 7. Otro ingresa nota general 7 y ajuste +0,1: su nota final es 7,1. El promedio de ambos es 7,05. Editar uno de esos ajustes no modifica la nota ni los ajustes de la otra persona.
+Ejemplo confirmado de independencia: el administrador registra una amarilla para un jugador. Un evaluador ingresa nota general 7 y ajuste 0: su nota final es 7. Otro ingresa nota general 7 y ajuste +0,1: su nota final es 7,1. El promedio de ambos es 7,05. Editar uno de esos ajustes no modifica la nota ni los ajustes de la otra persona.
 
 ### Flujo de registro y valoración
 
@@ -141,7 +141,7 @@ Las reglas se pueden probar en `src/domain/rules.test.ts`. En la app real el cá
 - Se muestran propuestas individuales sin identificar a sus autores.
 - Si un jugador gana en dos posiciones, el algoritmo actual lo detecta. Resolverlo exige acordar una regla; una asignación global sin repeticiones podría cambiar al ganador de una posición. No se impondrá ese cambio sin decidirlo.
 
-El editor ofrece posiciones pulsables, un selector de jugador que deshabilita a quienes ya están ubicados y una plantilla ficticia para completar rápidamente. El cálculo vuelve a validar la propuesta al guardar. Las sesiones simuladas de Mateo y Andrés empiezan sin propuesta, mientras otras cuatro propuestas ficticias permiten explorar la votación. Los datos solo viven en memoria.
+El editor ofrece posiciones pulsables, un selector de jugador que deshabilita a quienes ya están ubicados y autocompletado con la plantilla de combo del Inge, priorizando las posiciones registradas y a Diego Segura como portero. El cálculo vuelve a validar la propuesta al guardar. Las sesiones simuladas de William Mendoza y Checho empiezan sin propuesta, mientras otras cuatro propuestas ficticias permiten explorar la votación. Con ocho jugadores, fútbol 11 conserva tres vacantes y no genera propuestas ficticias completas. Los datos solo viven en memoria.
 
 Las identidades se usan internamente para limitar un voto por persona. La función de presentación elimina el campo de autor de las propuestas anónimas; en producción esa eliminación y el control de acceso ocurrirán en el servidor. Las pruebas cubren conteos, reemplazos, empates, mezcla de torneos/modalidades, plantillas incompletas y posiciones de diferentes formaciones.
 

@@ -25,6 +25,7 @@
 - Las vistas de registro del administrador y valoración del jugador deben estar separadas. La nota general la ingresa cada evaluador.
 - Titulares de prueba con varias formaciones. En fútbol 6: 3–2, 3–1–1, 2–2–1 y 2–3, además del arquero.
 - Mostrar cuál es la formación más seleccionada; conservar todos los empates.
+- Equipo de prueba: **combo del Inge**. La plantilla sustituye por completo a los jugadores ficticios anteriores: William Mendoza (09, delantero), Checho (7, volante), Diego Segura (23, portero), Fabian VARGAS (11, defensa), SEBAS (13, volante), Wilson Gómez (06, defensa), Ricky (5, delantero) y Chris (10, volante).
 
 ## Propuesta aplicada solo a la demo
 
@@ -33,7 +34,7 @@
 | Interfaz             | React + TypeScript + Vite                                                  | Base creada; se puede cambiar                            |
 | Backend              | Supabase                                                                   | Recomendado; sin contratar ni conectar                   |
 | Nombre               | La Cancha / app-futbol                                                     | Provisional                                              |
-| Plantilla de muestra | Los del Barrio                                                             | Completamente ficticia                                   |
+| Equipo y plantilla   | combo del Inge; ocho jugadores con dorsales y posiciones indicados         | Definidos por el usuario                                 |
 | Formaciones          | F6: 3–2, 3–1–1, 2–2–1 y 2–3; alternativas F5/F11                           | Opciones F6 solicitadas; F5/F11 de ejemplo               |
 | Voto de formación    | Una propuesta guardada por persona/torneo; cambiarla reemplaza la anterior | Regla aplicada a la prueba                               |
 | Titular colectiva    | Frecuencias de posición solo entre propuestas de la misma formación        | Evita mezclar ubicaciones distintas                      |
@@ -64,4 +65,6 @@ Los partidos, eventos y valoraciones de prueba viven en memoria y se pierden al 
 
 La titular permite elegir formación, seleccionar jugadores tocando posiciones de la cancha y guardar una propuesta completa sin repetir jugadores. Se simulan dos cuentas para comprobar reemplazos e independencia. El conteo excluye borradores; una propuesta editada conserva un solo voto. La votación presenta todas las formaciones líderes, los porcentajes sobre el total del torneo, las titulares colectivas por formación y las propuestas individuales sin autores. La tarjeta del resumen se actualiza con los mismos datos.
 
-Revisar las decisiones anteriores, crear el proyecto backend y su correo de autenticación, aplicar migraciones y políticas de acceso, y comprobar con varias cuentas que ni el administrador puede consultar autores. Hasta entonces solo se usan ejemplos ficticios.
+La plantilla y sus nombres proceden del usuario; los partidos, eventos, notas, propuestas y vínculos de cuentas continúan siendo simulados. Con ocho jugadores no se generan propuestas completas para fútbol 11: las posiciones que faltan quedan vacías y guardar exige completar toda la formación.
+
+Revisar las decisiones anteriores, crear el proyecto backend y su correo de autenticación, aplicar migraciones y políticas de acceso, y comprobar con varias cuentas que ni el administrador puede consultar autores. Hasta entonces no hay cuentas ni votos reales.

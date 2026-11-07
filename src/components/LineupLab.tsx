@@ -16,6 +16,7 @@ import {
   formationVoting,
   getFormation,
   lineupConsensus,
+  suggestLineup,
   upsertLineup,
 } from "../domain/lineups";
 import type {
@@ -238,8 +239,8 @@ export default function LineupLab(
       </div>
       {view === "results" && <LineupResults {...props} voting={voting} />}
       <div className="lineup-demo-footnote">
-        Datos ficticios · Una propuesta por persona y torneo. Las sesiones se
-        simulan para probar; el anonimato y el guardado entre dispositivos
+        Propuestas de prueba · Una propuesta por persona y torneo. Las sesiones
+        se simulan para probar; el anonimato y el guardado entre dispositivos
         requieren el backend. Al recargar se restaura la demo.
       </div>
     </div>
@@ -301,21 +302,14 @@ function LineupEditor({
     setMessage("");
   }
   function fillExample() {
-    const keeper =
-      props.players.find((player) => player.position === "Arquero") ??
-      props.players[0];
-    const ordered = [
-      keeper,
-      ...props.players.filter((player) => player.id !== keeper.id),
-    ].slice(0, selected.slots.length);
     setDrafts((current) => ({
       ...current,
-      [formationId]: Object.fromEntries(
-        selected.slots.map((slot, index) => [slot.id, ordered[index].id]),
-      ),
+      [formationId]: suggestLineup(selected, props.players),
     }));
     setMessage(
-      "Plantilla de ejemplo completada. Puedes cambiar cualquier posición antes de guardar.",
+      props.players.length < selected.slots.length
+        ? `Se ubicaron los ${props.players.length} jugadores de la plantilla. Faltan ${selected.slots.length - props.players.length} para completar esta formación.`
+        : "Plantilla completada según las posiciones de los jugadores. Puedes cambiarla antes de guardar.",
     );
   }
   function save() {
@@ -374,6 +368,14 @@ function LineupEditor({
             </button>
           ))}
         </div>
+        {props.players.length < selected.slots.length && (
+          <p className="lineup-save-status">
+            La plantilla tiene {props.players.length} jugadores. Esta modalidad
+            necesita {selected.slots.length}; faltan{" "}
+            {selected.slots.length - props.players.length} para guardar una
+            titular completa.
+          </p>
+        )}
         <LineupPitch
           formation={selected}
           positions={positions}
