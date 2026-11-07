@@ -21,6 +21,8 @@
 - Cada evaluador decide un ajuste por acción: amarilla −2 a +2; roja −3 a +3; gol 0 a +1; asistencia 0 a +0,5; portería en cero 0 a +1.
 - Cada acción se valora por separado y todos los ajustes se suman; dos goles permiten dos ajustes.
 - La valoración de las tarjetas depende del contexto y puede premiar o penalizar; no hay una penalización automática.
+- El administrador registra los eventos dentro del partido. Cada participante evalúa esos mismos eventos de forma independiente: un ajuste 0 y otro +0,1 modifican sus respectivas notas antes del promedio.
+- Las vistas de registro del administrador y valoración del jugador deben estar separadas. La nota general la ingresa cada evaluador.
 
 ## Propuesta aplicada solo a la demo
 
@@ -50,6 +52,10 @@
 
 ## Condición para pasar de demo a prueba real
 
-La demo ya permite registrar y retirar acciones, editar una nota base, ajustar cada acción y aplicar una valoración de ejemplo. Los promedios del partido, torneo y camisetas se actualizan en memoria. No hay autenticación ni persistencia real. Retirar una acción elimina sus ajustes de las valoraciones de prueba; en la versión conectada habrá que impedir cambios tras el cierre o reabrir la votación.
+La demo separa «Administrador» y «Jugador». La primera vista permite crear un partido con sus participantes y registrar sus eventos en el mismo lugar. La segunda permite elegir una de dos sesiones simuladas, escribir una nota general inicialmente vacía y valorar los eventos registrados por el administrador. Al volver a una sesión se recupera únicamente la valoración guardada para ella. Los autores de las valoraciones ficticias precargadas no se muestran.
+
+El promedio del partido se muestra con dos decimales: dos notas generales de 7 con ajustes 0 y +0,1 dan 7 y 7,1 finales, y 7,05 de promedio. La plantilla y la titular conservan un decimal de presentación, sin redondeos intermedios en el motor.
+
+Los partidos, eventos y valoraciones de prueba viven en memoria y se pierden al recargar. El selector de roles/sesiones es una herramienta de demostración, sin autenticación ni autorización reales. Retirar un evento elimina sus ajustes de las valoraciones de prueba; en la versión conectada habrá que impedir cambios tras el cierre o reabrir la votación.
 
 Revisar las decisiones anteriores, crear el proyecto backend y su correo de autenticación, aplicar migraciones y políticas de acceso, y comprobar con varias cuentas que ni el administrador puede consultar autores. Hasta entonces solo se usan ejemplos ficticios.

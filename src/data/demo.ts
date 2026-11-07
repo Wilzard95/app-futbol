@@ -211,10 +211,17 @@ export const matchEvents: MatchEvent[] = [
   action("m5-a1", "m5", "p5", "assist"),
 ];
 
+// The two editable demo sessions start without a general score or submitted ballot.
+export const demoSessionPlayerIds = ["p1", "p2"];
+
 // Synthetic, deterministic ballots for inspecting the proposed math. No real identities.
 export const ballots: RatingBallot[] = matches.flatMap((match, matchIndex) =>
   match.participantIds
-    .filter((id) => players.find((player) => player.id === id)?.linked)
+    .filter(
+      (id) =>
+        players.find((player) => player.id === id)?.linked &&
+        !demoSessionPlayerIds.includes(id),
+    )
     .flatMap((authorPlayerId, authorIndex) =>
       match.participantIds.map((targetPlayerId) => ({
         matchId: match.id,

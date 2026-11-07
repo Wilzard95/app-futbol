@@ -210,6 +210,41 @@ test("omitted adjustments are neutral; an action alone never creates a rating", 
   assert.equal(matchAverage(match, "a", [], events), null);
 });
 
+test("two evaluators can rate the same yellow card 0 and +0.1 independently before averaging", () => {
+  const playedMatch = { ...match, participantIds: ["a", "b", "c"] };
+  const events = [action("yellow", "yellow_card", "c")];
+  const first: RatingBallot = {
+    matchId: "m1",
+    authorPlayerId: "a",
+    targetPlayerId: "c",
+    score: 7,
+    eventAdjustments: [{ eventId: "yellow", value: 0 }],
+  };
+  const second: RatingBallot = {
+    matchId: "m1",
+    authorPlayerId: "b",
+    targetPlayerId: "c",
+    score: 7,
+    eventAdjustments: [{ eventId: "yellow", value: 0.1 }],
+  };
+  assert.equal(adjustedRating(playedMatch, first, events).finalScore, 7);
+  assert.equal(adjustedRating(playedMatch, second, events).finalScore, 7.1);
+  assert.ok(
+    Math.abs(matchAverage(playedMatch, "c", [first, second], events)! - 7.05) <
+      1e-12,
+  );
+  const editedFirst = {
+    ...first,
+    eventAdjustments: [{ eventId: "yellow", value: 1 }],
+  };
+  assert.equal(adjustedRating(playedMatch, second, events).finalScore, 7.1);
+  assert.ok(
+    Math.abs(
+      matchAverage(playedMatch, "c", [editedFirst, second], events)! - 7.55,
+    ) < 1e-12,
+  );
+});
+
 test("reject duplicate adjustments, invented actions, other players and other matches", () => {
   const events = [
     action("own", "goal"),

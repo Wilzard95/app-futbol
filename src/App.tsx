@@ -22,7 +22,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   ballots,
   matchEvents,
-  matches,
+  matches as demoMatches,
   players,
   proposals,
   tournaments,
@@ -30,6 +30,7 @@ import {
 import MatchRatingsDemo from "./components/MatchRatingsDemo";
 import { consensus, formations, tournamentAverage } from "./domain/rules";
 import type {
+  Match,
   MatchEvent,
   Player,
   RatingBallot,
@@ -81,12 +82,14 @@ function Pitch({
   compact = false,
   ratings,
   events,
+  matches,
 }: {
   tournament: Tournament;
   proposalId: string;
   compact?: boolean;
   ratings: RatingBallot[];
   events: MatchEvent[];
+  matches: Match[];
 }) {
   const formation = formations[tournament.format];
   const result = consensus(tournament.id, formation.slots, proposals);
@@ -172,6 +175,7 @@ export default function App() {
   const [proposalId, setProposalId] = useState("consensus");
   const [events, setEvents] = useState(matchEvents);
   const [ratings, setRatings] = useState(ballots);
+  const [matches, setMatches] = useState(demoMatches);
   const tournament = tournaments.find((item) => item.id === tournamentId)!;
   const tournamentMatches = matches.filter(
     (match) => match.tournamentId === tournamentId,
@@ -387,7 +391,7 @@ export default function App() {
           <CodeXml size={17} /> Ver el proyecto <ArrowUpRight size={14} />
         </a>
         <div className="sidebar-bottom">
-          <span className="version-dot" /> Base del proyecto <span>v0.2</span>
+          <span className="version-dot" /> Base del proyecto <span>v0.3</span>
         </div>
       </aside>
 
@@ -571,6 +575,7 @@ export default function App() {
                       compact
                       ratings={ratings}
                       events={events}
+                      matches={matches}
                     />
                     <button
                       className="lineup-button"
@@ -633,20 +638,25 @@ export default function App() {
                     Primero, la participación. Después, la valoración.
                   </strong>
                   <p>
-                    El administrador registrará quién jugó. Cada participante
-                    con cuenta podrá valorar a sus compañeros y a sí mismo una
-                    vez por partido.
+                    El administrador registra el partido, quién jugó y sus
+                    eventos. Después cada participante elige su nota general y
+                    sus ajustes. El promedio se calcula a partir de las notas
+                    finales de todos.
                   </p>
                 </div>
               </div>
               <MatchRatingsDemo
                 key={tournamentId}
+                tournamentId={tournamentId}
                 matches={tournamentMatches}
                 players={players}
                 events={events}
                 ballots={ratings}
                 onEventsChange={updateEvents}
                 onBallotsChange={setRatings}
+                onMatchCreate={(match) =>
+                  setMatches((current) => [match, ...current])
+                }
               />
             </>
           )}
@@ -683,6 +693,7 @@ export default function App() {
                   proposalId={proposalId}
                   ratings={ratings}
                   events={events}
+                  matches={matches}
                 />
               </section>
               <div className="lineup-explainer">

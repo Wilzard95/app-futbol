@@ -88,7 +88,7 @@ Escala confirmada de 1 a 10; autoevaluación incluida con el mismo peso propuest
 3. Nota del partido: media de las notas finales válidas recibidas por ese jugador en ese partido.
 4. Nota del torneo: media de las notas de los partidos valorados del jugador en ese torneo.
 5. No participar o no tener votos se representa con `null`/«—», sin introducir ceros. Las acciones sin ningún voto no crean una nota.
-6. No se mezclan torneos. Se calcula con precisión completa y se redondea a un decimal solo al mostrar.
+6. No se mezclan torneos. Se calcula con precisión completa; el promedio del partido se presenta con dos decimales y las notas del torneo con uno, sin redondeos intermedios.
 7. Cada partido tiene el mismo peso. Por ejemplo, un partido con media 9 y otro con media 5 dan 7, aunque tengan distinto número de evaluadores.
 
 ### Acciones y ajustes confirmados
@@ -106,6 +106,18 @@ El administrador registra los hechos y sus destinatarios; no decide el ajuste de
 Cada acción tiene un identificador independiente. Dos goles permiten dos ajustes de hasta +1. Se rechazan ajustes duplicados, fuera de rango, sin acción registrada, de otro jugador o de otro partido. No se crean automáticamente goles, asistencias ni una roja adicional por segunda amarilla: el administrador registra los hechos que se deben valorar.
 
 Ejemplo: base 7 + gol 1 + asistencia 0,5 − amarilla 2 = 6,5. Base 9 + roja 3 = 12 en bruto y 10 final. Primero se limita cada valoración y después se promedian: dos notas finales 10 y 1 dan 5,5.
+
+Ejemplo confirmado de independencia: el administrador registra una amarilla para Daniel. Un evaluador ingresa nota general 7 y ajuste 0: su nota final es 7. Otro ingresa nota general 7 y ajuste +0,1: su nota final es 7,1. El promedio de ambos es 7,05. Editar uno de esos ajustes no modifica la nota ni los ajustes de la otra persona.
+
+### Flujo de registro y valoración
+
+1. El administrador registra el partido dentro del torneo, su fecha, marcador y participantes.
+2. En el mismo partido registra goles, asistencias, amarillas, rojas y porterías en cero, indicando sus destinatarios y el contexto opcional. La lista reúne los eventos de todos los participantes.
+3. El jugador abre el partido desde su propia cuenta, selecciona a un participante e ingresa su nota general, inicialmente vacía. Los eventos aparecen a partir del registro administrativo.
+4. El jugador asigna un ajuste independiente a cada evento de ese destinatario. Se guarda una valoración por autor, destinatario y partido.
+5. El servidor calcula cada nota final y después el promedio colectivo; solo devuelve los resultados y datos que permitan las reglas de publicación y privacidad.
+
+La demo separa las dos vistas y ofrece dos sesiones ficticias para verificar el flujo. Esas sesiones no tienen votos iniciales precargados; otras valoraciones sintéticas mantienen los ejemplos de ranking. Crear un partido nuevo permite probar dos votos sin ningún dato previo. Los partidos creados en memoria alimentan tanto las estadísticas como los promedios de la plantilla y la titular. El selector de sesión no se incluirá como mecanismo de acceso en la versión con cuentas reales.
 
 La portería en cero se asigna expresamente al participante que indique el administrador. No se restringe automáticamente al arquero ni se infiere únicamente del marcador final, que no representa el tiempo individual en cancha. Solo se admite una por jugador y partido. En la versión conectada habrá que definir cómo verificarla según participación y sustituciones.
 

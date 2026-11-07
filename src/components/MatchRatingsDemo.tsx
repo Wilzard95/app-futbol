@@ -7,6 +7,8 @@ import {
   validateMatchEvents,
 } from "../domain/events";
 import { matchAverage } from "../domain/rules";
+import { demoSessionPlayerIds } from "../data/demo";
+import MatchCreateForm from "./MatchCreateForm";
 import type {
   Match,
   MatchEvent,
@@ -15,21 +17,25 @@ import type {
   RatingBallot,
 } from "../domain/types";
 
-const number = (value: number) => value.toFixed(1);
+const number = (value: number, digits = 1) => value.toFixed(digits);
 const signed = (value: number) => `${value > 0 ? "+" : ""}${number(value)}`;
 const eventKinds = Object.keys(eventRules) as MatchEventKind[];
 
 interface Props {
+  tournamentId: string;
   matches: Match[];
   players: Player[];
   events: MatchEvent[];
   ballots: RatingBallot[];
   onEventsChange: (events: MatchEvent[]) => void;
   onBallotsChange: (ballots: RatingBallot[]) => void;
+  onMatchCreate: (match: Match) => void;
 }
 
 export default function MatchRatingsDemo(props: Props) {
   const [matchId, setMatchId] = useState(props.matches[0].id);
+  const [mode, setMode] = useState<"admin" | "player">("admin");
+  const [creatingMatch, setCreatingMatch] = useState(false);
   const match =
     props.matches.find((item) => item.id === matchId) ?? props.matches[0];
   return (
@@ -37,31 +43,85 @@ export default function MatchRatingsDemo(props: Props) {
       <div className="section-heading">
         <div>
           <h2>
-            Acciones que cuentan <span>DEMO INTERACTIVA</span>
+            El partido y sus valoraciones <span>DEMO INTERACTIVA</span>
           </h2>
           <p>
-            El administrador registra lo ocurrido. Cada participante decide
-            cuánto suma o resta.
+            Primero se registran los hechos del partido. Después cada
+            participante los valora de forma independiente.
           </p>
         </div>
         <SlidersHorizontal size={21} />
       </div>
       <div
-        className="event-rule-strip"
-        aria-label="Rangos de ajuste por acción"
+        className="workflow-switch"
+        role="group"
+        aria-label="Vista de prueba"
       >
-        {eventKinds.map((kind) => (
-          <div key={kind}>
-            <span className={`event-mark ${kind}`} aria-hidden="true" />
-            <span>{eventRules[kind].label}</span>
-            <strong>
-              {signed(eventRules[kind].min)} a {signed(eventRules[kind].max)}
-            </strong>
-          </div>
-        ))}
+        <button
+          type="button"
+          aria-pressed={mode === "admin"}
+          onClick={() => setMode("admin")}
+        >
+          <ClipboardPen size={17} />
+          1. Administrador
+        </button>
+        <button
+          type="button"
+          aria-pressed={mode === "player"}
+          onClick={() => setMode("player")}
+        >
+          <SlidersHorizontal size={17} />
+          2. Jugador
+        </button>
       </div>
+      {mode === "admin" && (
+        <div className="admin-match-toolbar">
+          <p>
+            Registra el partido y sus eventos. Cada evaluador elegirá después
+            cuánto suman o restan a su propia nota.
+          </p>
+          <button
+            type="button"
+            className="lab-primary-button"
+            onClick={() => setCreatingMatch(!creatingMatch)}
+          >
+            <Plus size={15} />
+            Registrar otro partido
+          </button>
+        </div>
+      )}
+      {mode === "admin" && creatingMatch && (
+        <MatchCreateForm
+          tournamentId={props.tournamentId}
+          players={props.players}
+          onCancel={() => setCreatingMatch(false)}
+          onCreate={(created) => {
+            props.onMatchCreate(created);
+            setMatchId(created.id);
+            setCreatingMatch(false);
+          }}
+        />
+      )}
+      {mode === "player" && (
+        <div
+          className="event-rule-strip"
+          aria-label="Rangos de ajuste por acción"
+        >
+          {eventKinds.map((kind) => (
+            <div key={kind}>
+              <span className={`event-mark ${kind}`} aria-hidden="true" />
+              <span>{eventRules[kind].label}</span>
+              <strong>
+                {signed(eventRules[kind].min)} a {signed(eventRules[kind].max)}
+              </strong>
+            </div>
+          ))}
+        </div>
+      )}
       <label className="lab-match-picker">
-        Partido a explorar
+        {mode === "admin"
+          ? "Partido para registrar eventos"
+          : "Partido a calificar"}
         <select
           value={match.id}
           onChange={(event) => setMatchId(event.target.value)}
@@ -74,17 +134,22 @@ export default function MatchRatingsDemo(props: Props) {
           ))}
         </select>
       </label>
-      <MatchEditor key={match.id} {...props} match={match} />
+      {mode === "admin" ? (
+        <AdminEventEditor key={match.id} {...props} match={match} />
+      ) : (
+        <PlayerRatingView key={match.id} {...props} match={match} />
+      )}
       <div className="panel-footnote">
-        Demostración con datos ficticios. Los cambios se reflejan en el resumen
-        y la titular durante esta sesión; se pierden al recargar. Los permisos y
+        Demostración con datos ficticios: el selector de vista simula los dos
+        roles. Los cambios se reflejan en el resumen y la titular durante esta
+        sesión y se pierden al recargar. El acceso por cuentas, los permisos y
         el guardado privado requieren el backend.
       </div>
     </section>
   );
 }
 
-function MatchEditor({ match, ...props }: Props & { match: Match }) {
+function AdminEventEditor({ match, ...props }: Props & { match: Match }) {
   const participants = props.players.filter((player) =>
     match.participantIds.includes(player.id),
   );
@@ -95,11 +160,9 @@ function MatchEditor({ match, ...props }: Props & { match: Match }) {
   const [context, setContext] = useState("");
   const [message, setMessage] = useState("");
   const player = participants.find((item) => item.id === playerId)!;
-  const targetEvents = props.events.filter(
-    (event) => event.matchId === match.id && event.playerId === playerId,
+  const registeredEvents = props.events.filter(
+    (event) => event.matchId === match.id,
   );
-  // This actor is synthetic. Production must derive the author from the session.
-  const authorId = participants.find((item) => item.linked)?.id;
 
   function registerEvent(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -118,33 +181,176 @@ function MatchEditor({ match, ...props }: Props & { match: Match }) {
       props.onEventsChange(next);
       setContext("");
       setMessage(
-        `${eventRules[kind].label}: acción registrada para ${player.name}. Ya se puede valorar.`,
+        `${eventRules[kind].label}: evento registrado para ${player.name}. Cada participante podrá asignarle su propio ajuste.`,
       );
     } catch (error) {
       setMessage(
         error instanceof Error
           ? error.message
-          : "No se pudo registrar la acción.",
+          : "No se pudo registrar el evento.",
       );
     }
   }
 
-  function removeEvent(id: string) {
-    props.onEventsChange(props.events.filter((event) => event.id !== id));
-    setMessage("Acción retirada junto con sus ajustes de prueba.");
-  }
-
   return (
-    <>
+    <div className="admin-events-view">
+      <div className="admin-event-column">
+        <div className="lab-column-heading">
+          <ClipboardPen size={18} />
+          <div>
+            <h3>Registrar eventos del partido</h3>
+            <p>Indica qué ocurrió, a quién y el contexto opcional.</p>
+          </div>
+        </div>
+        <form className="event-register-form" onSubmit={registerEvent}>
+          <label>
+            Jugador del evento
+            <select
+              value={playerId}
+              onChange={(event) => {
+                setPlayerId(event.target.value);
+                setContext("");
+                setMessage("");
+              }}
+            >
+              {participants.map((item) => (
+                <option key={item.id} value={item.id}>
+                  #{item.number} · {item.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Evento
+            <select
+              value={kind}
+              onChange={(event) =>
+                setKind(event.target.value as MatchEventKind)
+              }
+            >
+              {eventKinds.map((item) => (
+                <option key={item} value={item}>
+                  {eventRules[item].label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Contexto <span>(opcional)</span>
+            <textarea
+              value={context}
+              onChange={(event) => setContext(event.target.value)}
+              maxLength={280}
+              rows={2}
+              placeholder="Ej.: cortó un contragolpe o protestó al árbitro"
+            />
+          </label>
+          <button className="lab-primary-button" type="submit">
+            <Plus size={15} />
+            Registrar evento del partido
+          </button>
+        </form>
+        <p className="lab-status" role="status">
+          {message}
+        </p>
+      </div>
+      <div className="registered-match-events">
+        <h3>
+          Eventos registrados <span>{registeredEvents.length}</span>
+        </h3>
+        <p>
+          Estos son los mismos hechos que verán los jugadores al calificar este
+          partido.
+        </p>
+        {registeredEvents.length === 0 ? (
+          <p className="lab-empty">Este partido todavía no tiene eventos.</p>
+        ) : (
+          registeredEvents.map((event, index) => (
+            <div className="registered-event" key={event.id}>
+              <span className={`event-mark ${event.kind}`} aria-hidden="true" />
+              <div>
+                <strong>
+                  {eventRules[event.kind].label} ·{" "}
+                  {
+                    props.players.find((item) => item.id === event.playerId)!
+                      .name
+                  }
+                </strong>
+                {event.context && <p>{event.context}</p>}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  props.onEventsChange(
+                    props.events.filter((item) => item.id !== event.id),
+                  );
+                  setMessage(
+                    "Evento retirado junto con sus ajustes de prueba.",
+                  );
+                }}
+                aria-label={`Quitar ${eventRules[event.kind].label.toLowerCase()}, evento ${index + 1}`}
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PlayerRatingView({ match, ...props }: Props & { match: Match }) {
+  const participants = props.players.filter((player) =>
+    match.participantIds.includes(player.id),
+  );
+  const linked = participants.filter((player) => player.linked);
+  const preferred = linked.filter((player) =>
+    demoSessionPlayerIds.includes(player.id),
+  );
+  const sessions = preferred.length ? preferred : linked;
+  const [authorId, setAuthorId] = useState(sessions[0]?.id ?? "");
+  const [playerId, setPlayerId] = useState(
+    participants.find((player) => player.id === "p3")?.id ?? participants[0].id,
+  );
+  const player = participants.find((item) => item.id === playerId)!;
+  if (!sessions.length)
+    return (
+      <p className="lab-empty player-rating-view">
+        Se necesita un participante vinculado para calificar este partido.
+      </p>
+    );
+  return (
+    <div className="player-rating-view">
+      <div className="demo-session-box">
+        <strong>
+          Sesión de prueba:{" "}
+          {sessions.find((item) => item.id === authorId)!.name}
+        </strong>
+        <p>
+          Estás editando únicamente la valoración de esta cuenta simulada.
+          Puedes cambiar de sesión para probar dos opiniones distintas sobre el
+          mismo evento.
+        </p>
+        <label>
+          Simular mi cuenta
+          <select
+            value={authorId}
+            onChange={(event) => setAuthorId(event.target.value)}
+          >
+            {sessions.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <label className="lab-player-picker">
-        Jugador participante
+        Jugador a calificar
         <select
           value={playerId}
-          onChange={(event) => {
-            setPlayerId(event.target.value);
-            setContext("");
-            setMessage("");
-          }}
+          onChange={(event) => setPlayerId(event.target.value)}
         >
           {participants.map((item) => (
             <option key={item.id} value={item.id}>
@@ -153,100 +359,16 @@ function MatchEditor({ match, ...props }: Props & { match: Match }) {
           ))}
         </select>
       </label>
-      <div className="event-lab-grid">
-        <div className="admin-event-column">
-          <div className="lab-column-heading">
-            <ClipboardPen size={18} />
-            <div>
-              <h3>1. Registrar acciones</h3>
-              <p>Vista de administrador de ejemplo</p>
-            </div>
-          </div>
-          <form className="event-register-form" onSubmit={registerEvent}>
-            <label>
-              Acción
-              <select
-                value={kind}
-                onChange={(event) =>
-                  setKind(event.target.value as MatchEventKind)
-                }
-              >
-                {eventKinds.map((item) => (
-                  <option key={item} value={item}>
-                    {eventRules[item].label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Contexto <span>(opcional)</span>
-              <textarea
-                value={context}
-                onChange={(event) => setContext(event.target.value)}
-                maxLength={280}
-                rows={2}
-                placeholder="Ej.: cortó un contragolpe o protestó al árbitro"
-              />
-            </label>
-            <button className="lab-primary-button" type="submit">
-              <Plus size={15} /> Registrar acción de prueba
-            </button>
-          </form>
-          <div className="registered-actions">
-            <h4>
-              Acciones de {player.name.split(" ")[0]}{" "}
-              <span>{targetEvents.length}</span>
-            </h4>
-            {targetEvents.length === 0 ? (
-              <p className="lab-empty">
-                Sin acciones registradas. Se puede valorar su desempeño con la
-                nota base.
-              </p>
-            ) : (
-              targetEvents.map((event, index) => (
-                <div className="registered-event" key={event.id}>
-                  <span
-                    className={`event-mark ${event.kind}`}
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <strong>
-                      {eventRules[event.kind].label} · acción {index + 1}
-                    </strong>
-                    {event.context && <p>{event.context}</p>}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeEvent(event.id)}
-                    aria-label={`Quitar ${eventRules[event.kind].label.toLowerCase()}, acción ${index + 1}`}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-          <p className="lab-status" role="status">
-            {message}
-          </p>
-        </div>
-        {authorId ? (
-          <BallotEditor
-            key={playerId}
-            match={match}
-            player={player}
-            authorId={authorId}
-            events={props.events}
-            ballots={props.ballots}
-            onBallotsChange={props.onBallotsChange}
-          />
-        ) : (
-          <p className="lab-empty">
-            Se necesita un participante vinculado para valorar.
-          </p>
-        )}
-      </div>
-    </>
+      <BallotEditor
+        key={`${playerId}-${authorId}`}
+        match={match}
+        player={player}
+        authorId={authorId}
+        events={props.events}
+        ballots={props.ballots}
+        onBallotsChange={props.onBallotsChange}
+      />
+    </div>
   );
 }
 
@@ -271,7 +393,7 @@ function BallotEditor({
       ballot.authorPlayerId === authorId &&
       ballot.targetPlayerId === player.id,
   );
-  const [base, setBase] = useState(String(previous?.score ?? 7));
+  const [base, setBase] = useState(previous ? String(previous.score) : "");
   const [values, setValues] = useState<Record<string, number>>(() =>
     Object.fromEntries(
       (previous?.eventAdjustments ?? []).map((item) => [
@@ -322,26 +444,39 @@ function BallotEditor({
       <div className="lab-column-heading">
         <SlidersHorizontal size={18} />
         <div>
-          <h3>2. Valorar el desempeño</h3>
-          <p>Tu valoración de ejemplo · autoría privada en la app real</p>
+          <h3>Tu valoración de {player.name}</h3>
+          <p>
+            Los eventos los registró el administrador. Tú decides su efecto en
+            tu nota.
+          </p>
         </div>
       </div>
       <label className="base-score-field">
-        Nota base de {player.name.split(" ")[0]}
+        Tu nota general para {player.name.split(" ")[0]}
         <input
           type="number"
           min={1}
           max={10}
           step={0.1}
           required
+          placeholder="1 a 10"
           value={base}
           onChange={(event) => {
             setBase(event.target.value);
             setSaved(false);
           }}
         />
-        <span>Del 1 al 10, antes de los ajustes.</span>
+        <span>
+          Escríbela tú, del 1 al 10, según su desempeño en el partido.
+        </span>
       </label>
+      <div className="personal-adjustments-heading">
+        <h4>Tus ajustes por los eventos registrados</h4>
+        <p>
+          Otro compañero puede valorar el mismo evento de forma distinta. Cada
+          ajuste se suma únicamente a la nota de quien lo emite.
+        </p>
+      </div>
       <div className="adjustment-list">
         {targetEvents.map((event, index) => {
           const rule = eventRules[event.kind];
@@ -385,19 +520,19 @@ function BallotEditor({
         })}
         {targetEvents.length === 0 && (
           <p className="lab-empty">
-            Los ajustes aparecerán cuando el administrador registre una acción
-            de este jugador.
+            Este jugador no tiene eventos registrados en el partido. Su nota
+            general será tu nota final.
           </p>
         )}
       </div>
       <div className="rating-calculation" aria-live="polite">
         <div>
-          <span>Base</span>
+          <span>Tu nota general</span>
           <strong>{valid ? number(draft.score) : "—"}</strong>
         </div>
         <span>+</span>
         <div>
-          <span>Ajustes</span>
+          <span>Tus ajustes</span>
           <strong>{result ? signed(result.adjustment) : "—"}</strong>
         </div>
         <span>=</span>
@@ -408,27 +543,29 @@ function BallotEditor({
       </div>
       {result?.limited && (
         <p className="clamp-note">
-          La suma da {number(result.rawScore)}; la nota final se limita a{" "}
+          La suma da {number(result.rawScore)}; tu nota final se limita a{" "}
           {number(result.finalScore)} para mantener la escala de 1 a 10.
         </p>
       )}
       <button className="lab-primary-button" type="submit" disabled={!valid}>
-        Aplicar valoración de prueba
+        Guardar mi valoración de prueba
       </button>
       <div className="collective-average">
         <span>
           Promedio colectivo del partido
-          <strong>{average === null ? "—" : number(average)}</strong>
+          <strong>{average === null ? "—" : number(average, 2)}</strong>
         </span>
         <p>
-          Incluye las notas finales ya aplicadas, cada una con sus propios
-          ajustes. Este es el resultado que alimenta el promedio del torneo.
+          Primero se calcula la nota final de cada evaluador; después se
+          promedian todas. Se muestran dos decimales para apreciar ajustes
+          pequeños. En los partidos de muestra también hay valoraciones
+          ficticias precargadas.
         </p>
       </div>
       <p className="lab-status" role="status">
         {saved
-          ? "Valoración de prueba aplicada. Puedes ver el cambio en la plantilla y la titular."
-          : "Los cambios del formulario solo afectan el promedio al aplicarlos."}
+          ? "Tu valoración de prueba quedó aplicada al promedio del partido y del torneo."
+          : "Solo tu valoración cambia al guardar. Las opiniones de los demás se mantienen independientes."}
       </p>
     </form>
   );
