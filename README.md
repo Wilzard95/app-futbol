@@ -4,7 +4,7 @@ Base de una aplicación web para equipos de amigos: torneos, partidos, jugadores
 
 ## Estado de esta versión
 
-Demostración navegable con el equipo, plantilla, torneo, marcador y eventos indicados por el usuario. Las cuentas y las calificaciones son simuladas. No hay autenticación, servidor, persistencia, invitaciones reales ni envío de votos entre dispositivos. Las notas y propuestas empiezan vacías; recargar vuelve al estado inicial.
+Demostración navegable con el equipo, plantilla, torneo, marcador y eventos indicados por el usuario. La sección «Mi cuenta» conecta con Supabase para el registro por correo, invitaciones y vinculación de fichas. Los partidos, las calificaciones y las titulares siguen siendo una simulación en memoria, sin votos compartidos entre dispositivos. El envío de correos requiere configurar Gmail SMTP. Las notas y propuestas empiezan vacías; recargar vuelve al estado inicial.
 
 | Jugador         | Dorsal | Posición  |
 | --------------- | ------ | --------- |
@@ -74,7 +74,7 @@ docs/
 
 ## Tecnología
 
-La base usa **React + TypeScript + Vite**, que generan HTML, CSS y JavaScript estáticos para GitHub Pages. La propuesta para la siguiente fase es **Supabase Auth + PostgreSQL + RLS + funciones de servidor**. El proyecto de Supabase está creado; la autenticación y los permisos aún están pendientes de configuración.
+La base usa **React + TypeScript + Vite**, que generan HTML, CSS y JavaScript estáticos para GitHub Pages. La propuesta para la siguiente fase es **Supabase Auth + PostgreSQL + RLS + funciones de servidor**. El proyecto de Supabase está creado y tiene funciones de cuentas y vinculación. Las valoraciones reales y sus garantías de anonimato todavía requieren implementación y pruebas.
 
 HTML sigue siendo parte de la aplicación. React ayuda a mantener sincronizados formularios, torneos, jugadores y alineaciones; TypeScript evita mezclar accidentalmente sus datos. GitHub Pages aloja la interfaz; la autorización y los datos compartidos vivirán en el backend.
 

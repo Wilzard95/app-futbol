@@ -28,16 +28,18 @@ import {
   tournaments,
 } from "./data/demo";
 import MatchRatingsDemo from "./components/MatchRatingsDemo";
+import Account from "./components/Account";
 import LineupLab, { LineupOverview } from "./components/LineupLab";
 import { tournamentAverage } from "./domain/rules";
 import type { MatchEvent, Player } from "./domain/types";
 
-type View = "overview" | "players" | "matches" | "lineup";
+type View = "overview" | "players" | "matches" | "lineup" | "account";
 const navigation: { id: View; label: string; icon: LucideIcon }[] = [
   { id: "overview", label: "Resumen", icon: LayoutDashboard },
   { id: "players", label: "Plantilla", icon: Users },
   { id: "matches", label: "Partidos", icon: CalendarDays },
   { id: "lineup", label: "Titular colectiva", icon: ClipboardList },
+  { id: "account", label: "Mi cuenta", icon: LockKeyhole },
 ];
 const scoreLabel = (score: number | null) =>
   score === null ? "—" : score.toFixed(1);
@@ -74,7 +76,7 @@ function PlayerAvatar({
 }
 
 export default function App() {
-  const [view, setView] = useState<View>("overview");
+  const [view, setView] = useState<View>(() => new URLSearchParams(location.search).has("account") || !!localStorage.getItem("la-cancha-invite") ? "account" : "overview");
   const [tournamentId, setTournamentId] = useState(tournaments[0].id);
   const [lineups, setLineups] = useState(demoProposals);
   const [events, setEvents] = useState(matchEvents);
@@ -329,7 +331,7 @@ export default function App() {
                     ? "Cada jugador cuenta."
                     : view === "matches"
                       ? "Nuestra historia, partido a partido."
-                      : "La titular la elegimos todos."}
+                      : view === "lineup" ? "La titular la elegimos todos." : "Tu cuenta en el equipo."}
               </h1>
               <p>
                 {view === "overview"
@@ -338,7 +340,7 @@ export default function App() {
                     ? "Una ficha por jugador. Sus números cambian con cada torneo."
                     : view === "matches"
                       ? "Solo quienes participaron podrán valorar y recibir valoraciones."
-                      : "Propuestas anónimas. Una elección colectiva para cada posición."}
+                      : view === "lineup" ? "Propuestas anónimas. Una elección colectiva para cada posición." : "Entra y vincula tu ficha de jugador."}
               </p>
             </div>
             <label className="tournament-picker">
@@ -525,8 +527,8 @@ export default function App() {
               {ratingsTable(true)}
               <div className="panel-footnote">
                 Los jugadores corresponden a la plantilla indicada. Las cuentas
-                y vinculaciones son simuladas; el acceso real requiere el
-                backend.
+                de esta tabla son simuladas. La vinculación real se administra
+                en «Mi cuenta».
               </div>
             </section>
           )}
@@ -583,13 +585,14 @@ export default function App() {
               onProposalsChange={setLineups}
             />
           )}
+          {view === "account" && <Account />}
 
           <footer className="page-footer">
             <span>
               LA CANCHA <span>·</span> Hecho para jugar en equipo.
             </span>
             <span>
-              Calificaciones y sesiones simuladas · Sin cuentas reales
+              Partidos y calificaciones simuladas · Cuentas en prueba
             </span>
           </footer>
         </main>

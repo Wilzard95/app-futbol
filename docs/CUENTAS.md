@@ -1,6 +1,6 @@
 # Propuesta de cuentas y vinculación
 
-Estado: el proyecto nuevo de Supabase para esta app ya está creado. Falta configurar la integración, autenticación y permisos. La demo usa la plantilla, torneo y partido indicados para combo del Inge; simula las ocho sesiones y sus votos. No hay botones de acceso real ni credenciales configuradas.
+Estado: el proyecto de Supabase y la base de cuentas están creados. La interfaz ofrece registro por correo, invitaciones y aprobación de fichas; el envío de correos con Gmail SMTP está pendiente de configuración y de una prueba completa. Los partidos, votos y titulares siguen siendo simulaciones.
 
 ## Formas de entrar recomendadas
 
@@ -39,7 +39,7 @@ Un administrador que también juega conserva una sola cuenta: su membresía llev
 
 ## Configuración pendiente
 
-Configurar Google OAuth y sus URLs de retorno, activar y verificar los correos de registro/recuperación, y aplicar las tablas, funciones y políticas del servidor. La web en GitHub Pages puede seguir alojando la interfaz. La integración de Supabase fue encontrada y ofrecida; no se ha confirmado su instalación/conexión. Nunca se solicitarán contraseñas ni claves privadas por el chat.
+Configurar Gmail SMTP y verificar los correos de registro y recuperación. Google OAuth requiere configuración adicional. Las tablas y funciones de cuentas ya se aplicaron; falta validar el flujo completo con cuentas reales. La web en GitHub Pages puede seguir alojando la interfaz. La integración de Supabase fue encontrada y ofrecida; no se ha confirmado su instalación/conexión. Nunca se solicitarán contraseñas ni claves privadas por el chat.
 
 ## Fuentes oficiales
 
