@@ -20,8 +20,8 @@ Demostración navegable con el equipo, plantilla, torneo, marcador y eventos ind
 La plantilla tiene ocho jugadores. Las formaciones de fútbol 11 mantienen tres vacantes y no permiten guardar una titular incompleta. El autocompletado usa a Diego como portero y prioriza las posiciones indicadas.
 
 - Resumen y plantilla con promedios independientes por torneo.
-- Un único torneo, **Grama 5**, en modalidad fútbol 6; un único partido, **vs. Compas, victoria 6–2**. La fecha está pendiente de confirmar.
-- Eventos registrados: tres goles de William, tres de Ricky, una amarilla a Ricky y una asistencia para William, Ricky y SEBAS respectivamente.
+- Un único torneo, **Grama 5**, en modalidad fútbol 6; dos partidos: **vs. Los primeros, victoria 6–2**, con fecha pendiente, y **vs. Compas, victoria 3–1**, el 8 de noviembre de 2026.
+- Contra Los primeros: tres goles de William, tres de Ricky, una amarilla a Ricky y una asistencia de William, Ricky y SEBAS. Contra Compas: goles de William, Ricky y Fabian VARGAS; asistencias de Ricky y Wilson; sin tarjetas.
 - Los ocho jugadores están habilitados como participantes de la simulación para poder valorar y ser valorados.
 - En «Partidos», vistas separadas de administrador y jugador. El administrador registra un partido, sus participantes y sus eventos; el jugador ingresa su nota general y sus ajustes personales.
 - Valoración por evento: amarillas −2/+2, rojas −3/+3, goles 0/+1, asistencias 0/+0,5 y porterías en cero 0/+1.
@@ -74,7 +74,7 @@ docs/
 
 ## Tecnología
 
-La base usa **React + TypeScript + Vite**, que generan HTML, CSS y JavaScript estáticos para GitHub Pages. La propuesta para la siguiente fase es **Supabase Auth + PostgreSQL + RLS + funciones de servidor**. Supabase todavía no está conectado ni creado.
+La base usa **React + TypeScript + Vite**, que generan HTML, CSS y JavaScript estáticos para GitHub Pages. La propuesta para la siguiente fase es **Supabase Auth + PostgreSQL + RLS + funciones de servidor**. El proyecto de Supabase está creado; la autenticación y los permisos aún están pendientes de configuración.
 
 HTML sigue siendo parte de la aplicación. React ayuda a mantener sincronizados formularios, torneos, jugadores y alineaciones; TypeScript evita mezclar accidentalmente sus datos. GitHub Pages aloja la interfaz; la autorización y los datos compartidos vivirán en el backend.
 

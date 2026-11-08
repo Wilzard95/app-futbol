@@ -51,13 +51,22 @@ export const tournaments: Tournament[] = [
 
 export const matches: Match[] = [
   {
-    id: "vs-compas",
+    id: "vs-los-primeros",
     tournamentId: "grama-5",
-    opponent: "Compas",
+    opponent: "Los primeros",
     playedAt: null,
     goalsFor: 6,
     goalsAgainst: 2,
     // All eight are enabled as participants for the requested simulation.
+    participantIds: players.map((player) => player.id),
+  },
+  {
+    id: "vs-compas",
+    tournamentId: "grama-5",
+    opponent: "Compas",
+    playedAt: "2026-11-08",
+    goalsFor: 3,
+    goalsAgainst: 1,
     participantIds: players.map((player) => player.id),
   },
 ];
@@ -66,9 +75,10 @@ const event = (
   id: string,
   playerId: string,
   kind: MatchEvent["kind"],
+  matchId = "vs-los-primeros",
 ): MatchEvent => ({
   id,
-  matchId: "vs-compas",
+  matchId,
   playerId,
   kind,
   context: "",
@@ -85,6 +95,11 @@ export const matchEvents: MatchEvent[] = [
   event("william-assist-1", "p1", "assist"),
   event("ricky-assist-1", "p7", "assist"),
   event("sebas-assist-1", "p5", "assist"),
+  event("compas-william-goal", "p1", "goal", "vs-compas"),
+  event("compas-ricky-goal", "p7", "goal", "vs-compas"),
+  event("compas-fabian-goal", "p4", "goal", "vs-compas"),
+  event("compas-ricky-assist", "p7", "assist", "vs-compas"),
+  event("compas-wilson-assist", "p6", "assist", "vs-compas"),
 ];
 
 // Everyone can enter their own simulated ratings and lineup; no votes are prefilled.

@@ -26,10 +26,10 @@
 - Titulares de prueba con varias formaciones. En fútbol 6: 3–2, 3–1–1, 2–2–1 y 2–3, además del arquero.
 - Mostrar cuál es la formación más seleccionada; conservar todos los empates.
 - Equipo de prueba: **combo del Inge**. La plantilla sustituye por completo a los jugadores ficticios anteriores: William Mendoza (09, delantero), Checho (7, volante), Diego Segura (23, portero), Fabian VARGAS (11, defensa), SEBAS (13, volante), Wilson Gómez (06, defensa), Ricky (5, delantero) y Chris (10, volante).
-- Un solo torneo de prueba, **Grama 5**, conservando la modalidad fútbol 6; un solo partido contra **Compas**, ganado **6–2**.
+- Un solo torneo de prueba, **Grama 5**, conservando la modalidad fútbol 6; dos partidos: **Los primeros**, ganado **6–2**, y **Compas**, ganado **3–1** el 8 de noviembre de 2026.
 - Tres goles para William y tres para Ricky; una amarilla a Ricky; una asistencia para William, Ricky y SEBAS.
 - Todos los jugadores pueden ingresar sus propias calificaciones simuladas. Para la prueba se habilitan los ocho como participantes; sin notas ni propuestas iniciales generadas automáticamente.
-- Para las cuentas reales se eligió **crear un proyecto nuevo de Supabase**. Aún requiere conectar el servicio y configurar autenticación y permisos.
+- Para las cuentas reales se eligió **crear un proyecto nuevo de Supabase**. El proyecto ya está creado; aún requiere conectar el servicio y configurar autenticación y permisos.
 
 ## Propuesta aplicada solo a la demo
 
@@ -69,6 +69,6 @@ Los partidos, eventos y valoraciones de prueba viven en memoria y se pierden al 
 
 La titular permite elegir formación, seleccionar jugadores tocando posiciones de la cancha y guardar una propuesta completa sin repetir jugadores. Se simulan las ocho cuentas para comprobar reemplazos e independencia. El conteo excluye borradores; una propuesta editada conserva un solo voto. La votación presenta todas las formaciones líderes, los porcentajes sobre el total del torneo, las titulares colectivas por formación y las propuestas individuales sin autores. La tarjeta del resumen se actualiza con los mismos datos.
 
-La plantilla, Grama 5, el resultado contra Compas y los diez eventos proceden del usuario. La fecha del partido no fue indicada: se guarda como desconocida y se muestra «Fecha por confirmar». Las notas, propuestas y vínculos de cuentas siguen siendo simulados, en memoria y sin compartir resultados entre dispositivos. Con ocho jugadores no se completaría una titular de fútbol 11; el catálogo permanece disponible en el código, mientras esta demo solo ofrece el torneo de fútbol 6.
+La plantilla, Grama 5, los resultados y los eventos proceden del usuario. El partido contra Los primeros tiene fecha pendiente; el partido contra Compas se jugó el 8 de noviembre de 2026. Las notas, propuestas y vínculos de cuentas siguen siendo simulados, en memoria y sin compartir resultados entre dispositivos. Con ocho jugadores no se completaría una titular de fútbol 11; el catálogo permanece disponible en el código, mientras esta demo solo ofrece el torneo de fútbol 6.
 
 Revisar las decisiones anteriores, crear el proyecto backend y su correo de autenticación, aplicar migraciones y políticas de acceso, y comprobar con varias cuentas que ni el administrador puede consultar autores. Hasta entonces no hay cuentas ni votos reales.
