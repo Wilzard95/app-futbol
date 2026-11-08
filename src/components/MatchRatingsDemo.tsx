@@ -142,9 +142,9 @@ export default function MatchRatingsDemo(props: Props) {
       <div className="panel-footnote">
         Partido y eventos registrados con la información indicada. El selector
         de vista simula los dos roles y permite calificar como cualquiera de los
-        ocho jugadores. Los cambios se reflejan en el resumen y la titular
-        durante esta sesión y se pierden al recargar. El acceso por cuentas, los
-        permisos y el guardado privado requieren el backend.
+        participantes del partido. Los cambios se reflejan en el resumen y la
+        titular durante esta sesión y se pierden al recargar. El acceso por
+        cuentas, los permisos y el guardado privado requieren el backend.
       </div>
     </section>
   );

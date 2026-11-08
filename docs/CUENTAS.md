@@ -1,6 +1,6 @@
 # Propuesta de cuentas y vinculación
 
-Estado: el proyecto de Supabase y la base de cuentas están creados. La interfaz ofrece registro por correo, invitaciones y aprobación de fichas; el envío de correos con Gmail SMTP está pendiente de configuración y de una prueba completa. Los partidos, votos y titulares siguen siendo simulaciones.
+Estado: el proyecto de Supabase y la base de cuentas están creados. La interfaz ofrece registro por correo, invitaciones y aprobación de fichas; el envío de correos con Gmail SMTP está configurado y la cuenta administradora se confirmó. Los partidos, votos y titulares tienen una versión conectada; falta probarla de extremo a extremo con varios compañeros.
 
 ## Formas de entrar recomendadas
 
@@ -39,7 +39,7 @@ Un administrador que también juega conserva una sola cuenta: su membresía llev
 
 ## Configuración pendiente
 
-Configurar Gmail SMTP y verificar los correos de registro y recuperación. Google OAuth requiere configuración adicional. Las tablas y funciones de cuentas ya se aplicaron; falta validar el flujo completo con cuentas reales. La web en GitHub Pages puede seguir alojando la interfaz. La integración de Supabase fue encontrada y ofrecida; no se ha confirmado su instalación/conexión. Nunca se solicitarán contraseñas ni claves privadas por el chat.
+Verificar con varios compañeros los correos de registro y recuperación. Google OAuth requiere configuración adicional. Las tablas y funciones de cuentas ya se aplicaron; falta validar el flujo completo con cuentas reales. La web en GitHub Pages puede seguir alojando la interfaz. La integración de Supabase fue encontrada y ofrecida; no se ha confirmado su instalación/conexión. Nunca se solicitarán contraseñas ni claves privadas por el chat.
 
 ## Fuentes oficiales
 

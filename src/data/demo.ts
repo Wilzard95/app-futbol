@@ -67,7 +67,9 @@ export const matches: Match[] = [
     playedAt: "2026-11-08",
     goalsFor: 3,
     goalsAgainst: 1,
-    participantIds: players.map((player) => player.id),
+    participantIds: players
+      .filter((player) => player.id !== "p8")
+      .map((player) => player.id),
   },
 ];
 

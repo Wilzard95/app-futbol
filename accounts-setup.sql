@@ -39,6 +39,7 @@ begin
  'revoked',coalesce(not m.active,false), 'canClaim',allowed and not coalesce(not m.active,false),
  'pending', (select player_id from app_private.claim where user_id=uid),
  'players',case when allowed then (select jsonb_agg(jsonb_build_object('id',p.id,'name',p.name,'number',p.number,'position',p.position,'occupied',exists(select 1 from app_private.member mm where mm.player_id=p.id and mm.active)) order by p.name) from app_private.player p) else '[]'::jsonb end,
+ 'linkedAccounts',case when m.active and m.role='admin' then (select coalesce(jsonb_agg(jsonb_build_object('playerId',mm.player_id,'email',u.email) order by mm.player_id),'[]'::jsonb) from app_private.member mm join auth.users u on u.id=mm.user_id where mm.active and mm.player_id is not null) else '[]'::jsonb end,
  'invite',case when m.active and m.role='admin' then (select invite::text from app_private.team where id='combo') else null end,
  'claims',case when m.active and m.role='admin' then (select coalesce(jsonb_agg(jsonb_build_object('userId',c.user_id,'playerId',c.player_id,'email',u.email,'name',p.name) order by c.created_at),'[]'::jsonb) from app_private.claim c join auth.users u on u.id=c.user_id join app_private.player p on p.id=c.player_id) else '[]'::jsonb end) into result;
  return result;

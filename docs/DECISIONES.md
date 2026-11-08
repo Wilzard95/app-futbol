@@ -28,8 +28,10 @@
 - Equipo de prueba: **combo del Inge**. La plantilla sustituye por completo a los jugadores ficticios anteriores: William Mendoza (09, delantero), Checho (7, volante), Diego Segura (23, portero), Fabian VARGAS (11, defensa), SEBAS (13, volante), Wilson Gómez (06, defensa), Ricky (5, delantero) y Chris (10, volante).
 - Un solo torneo de prueba, **Grama 5**, conservando la modalidad fútbol 6; dos partidos: **Los primeros**, ganado **6–2**, y **Compas**, ganado **3–1** el 8 de noviembre de 2026.
 - Tres goles para William y tres para Ricky; una amarilla a Ricky; una asistencia para William, Ricky y SEBAS.
-- Todos los jugadores pueden ingresar sus propias calificaciones simuladas. Para la prueba se habilitan los ocho como participantes; sin notas ni propuestas iniciales generadas automáticamente.
-- Para las cuentas reales se eligió **crear un proyecto nuevo de Supabase**. El proyecto ya está creado; aún requiere conectar el servicio y configurar autenticación y permisos.
+- Todos los jugadores pueden ingresar sus propias calificaciones simuladas. Se habilitan como participantes a los ocho contra Los primeros y a siete contra Compas (sin Chris); sin notas ni propuestas iniciales generadas automáticamente.
+- Las cuentas reales usan el proyecto de Supabase ya conectado, con registro por correo, invitaciones y aprobación de fichas.
+- Los resultados reales se muestran al llegar cada valoración, sin esperar al cierre ni exigir un mínimo de votos. Con pocos votos, los cambios o comentarios pueden permitir inferir la autoría.
+- En los partidos reales participaron los ocho contra Los primeros; contra Compas participaron siete, sin Chris.
 
 ## Propuesta aplicada solo a la demo
 

@@ -4,7 +4,7 @@ Base de una aplicación web para equipos de amigos: torneos, partidos, jugadores
 
 ## Estado de esta versión
 
-Demostración navegable con el equipo, plantilla, torneo, marcador y eventos indicados por el usuario. La sección «Mi cuenta» conecta con Supabase para el registro por correo, invitaciones y vinculación de fichas. Los partidos, las calificaciones y las titulares siguen siendo una simulación en memoria, sin votos compartidos entre dispositivos. El envío de correos requiere configurar Gmail SMTP. Las notas y propuestas empiezan vacías; recargar vuelve al estado inicial.
+Versión conectada en prueba para combo del Inge: cuentas por correo, fichas aprobadas, torneos, partidos, acciones, valoraciones y titulares se guardan en Supabase. La simulación anterior se conserva solo en desarrollo local y no se muestra en la web publicada. El correo de confirmación usa Gmail SMTP; Google OAuth aún no está configurado. Los resultados reales se actualizan periódicamente y muestran comentarios y propuestas sin identificar a sus autores.
 
 | Jugador         | Dorsal | Posición  |
 | --------------- | ------ | --------- |
@@ -22,15 +22,15 @@ La plantilla tiene ocho jugadores. Las formaciones de fútbol 11 mantienen tres 
 - Resumen y plantilla con promedios independientes por torneo.
 - Un único torneo, **Grama 5**, en modalidad fútbol 6; dos partidos: **vs. Los primeros, victoria 6–2**, el 1 de noviembre de 2026, y **vs. Compas, victoria 3–1**, el 8 de noviembre de 2026.
 - Contra Los primeros: tres goles de William, tres de Ricky, una amarilla a Ricky y una asistencia de William, Ricky y SEBAS. Contra Compas: goles de William, Ricky y Fabian VARGAS; asistencias de Ricky y Wilson; sin tarjetas.
-- Los ocho jugadores están habilitados como participantes de la simulación para poder valorar y ser valorados.
-- En «Partidos», vistas separadas de administrador y jugador. El administrador registra un partido, sus participantes y sus eventos; el jugador ingresa su nota general y sus ajustes personales.
+- Los ocho jugadores participaron contra Los primeros; contra Compas participaron siete, sin Chris.
+- En «Partidos», el administrador crea torneos, jugadores, partidos y acciones; abre la valoración después de registrarlas. Cada participante usa su cuenta para calificar.
 - Valoración por evento: amarillas −2/+2, rojas −3/+3, goles 0/+1, asistencias 0/+0,5 y porterías en cero 0/+1.
-- Ocho sesiones simuladas permiten probar opiniones independientes; todas empiezan sin notas ni propuestas precargadas. El promedio del partido muestra dos decimales para apreciar ajustes pequeños como +0,1.
-- Ajustes acumulativos por acción; cada voto final se limita a 1–10 antes de promediar. Cambios temporales reflejados en la plantilla y la titular.
+- Los votos reales se guardan de forma privada. El promedio del partido muestra dos decimales para apreciar ajustes pequeños como +0,1; la simulación conserva sesiones de prueba separadas.
+- Ajustes acumulativos por acción; cada voto final se limita a 1–10 antes de promediar. El resumen y la titular usan los resultados reales.
 - Fútbol **6 como modalidad principal**, además de fútbol 5 y 11.
 - Titular editable por torneo: fútbol 6 ofrece 3–2, 3–1–1, 2–2–1 y 2–3, siempre más un arquero. También hay alternativas para fútbol 5 y 11.
 - Votos y porcentajes por formación, con todos los líderes empatados. Guardar otra formación reemplaza la propuesta anterior de esa persona.
-- Titular colectiva y propuestas anónimas de ejemplo; empates superpuestos por posición.
+- Titular colectiva y propuestas anónimas reales; empates superpuestos por posición.
 - Detección de conflictos si alguien resulta elegido en varias posiciones.
 - Diseño adaptable a teléfonos y escritorio.
 
@@ -74,7 +74,7 @@ docs/
 
 ## Tecnología
 
-La base usa **React + TypeScript + Vite**, que generan HTML, CSS y JavaScript estáticos para GitHub Pages. La propuesta para la siguiente fase es **Supabase Auth + PostgreSQL + RLS + funciones de servidor**. El proyecto de Supabase está creado y tiene funciones de cuentas y vinculación. Las valoraciones reales y sus garantías de anonimato todavía requieren implementación y pruebas.
+La base usa **React + TypeScript + Vite**, que generan HTML, CSS y JavaScript estáticos para GitHub Pages. La propuesta para la siguiente fase es **Supabase Auth + PostgreSQL + RLS + funciones de servidor**. El proyecto de Supabase está creado y tiene funciones de cuentas y vinculación. Las funciones de valoración y titular protegen los autores frente a los usuarios de la app; los permisos y reglas tienen pruebas transaccionales, pero aún falta la prueba completa con varios compañeros.
 
 HTML sigue siendo parte de la aplicación. React ayuda a mantener sincronizados formularios, torneos, jugadores y alineaciones; TypeScript evita mezclar accidentalmente sus datos. GitHub Pages aloja la interfaz; la autorización y los datos compartidos vivirán en el backend.
 
@@ -87,3 +87,9 @@ Demo pública: [wilzard95.github.io/app-futbol/](https://wilzard95.github.io/app
 Cada cambio en `main` ejecuta pruebas, compila y publica `dist/`. Los pull requests solo verifican y compilan. Las decisiones pendientes están en [docs/DECISIONES.md](docs/DECISIONES.md).
 
 El repositorio y la demo inicial son públicos. Los datos reales del equipo deberán quedar protegidos en el backend, fuera del repositorio y de los archivos del sitio. Las fuentes tipográficas se cargan desde Google Fonts, con fuentes locales de respaldo.
+
+## Base de datos y pruebas de permisos
+
+Las tablas están en `app_private`, sin lectura directa desde la web. Las funciones públicas invocan funciones privadas que validan la sesión, membresía, participación y rangos. `sports-security-test.sql` prueba varias cuentas de prueba dentro de una transacción que termina en rollback. Los archivos `sports-*.sql` documentan la preparación: en una base nueva se aplica primero `sports-foundation.sql`, luego `sports-open.sql`, `sports-ratings.sql`, `sports-admin.sql`, `sports-players.sql`, `sports-lineups.sql`, `sports-read.sql` y por último `sports-seed.sql`, después de configurar cuentas. No volver a ejecutarlos sobre el proyecto actual.
+
+Los resultados se muestran al llegar las valoraciones, según la elección del equipo. Con pocos votos es posible inferir la autoría por el momento o el contenido. El administrador deportivo no recibe autores desde la app; quien tenga acceso privilegiado a la base de Supabase puede consultarlos.

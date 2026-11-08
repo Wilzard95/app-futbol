@@ -1,6 +1,8 @@
 # Propuesta técnica
 
-Estado: base de frontend implementada; backend propuesto, pendiente de acordar reglas y proveedor. Fecha: 7 de noviembre de 2026.
+Estado: versión conectada en prueba para un equipo con Supabase; las secciones de simulación permanecen separadas. Resultados visibles al llegar cada voto, según la elección del equipo.
+
+Este documento conserva decisiones y propuestas históricas. La implementación conectada y el orden actual de sus scripts se describen en el README; las propuestas no deben interpretarse como funciones ya disponibles.
 
 ## Componentes
 
@@ -34,13 +36,13 @@ Las decisiones de membresía y rol se toman en el servidor, nunca a partir de un
 
 El enlace de invitación al equipo y el enlace de inicio de sesión tienen propósitos distintos.
 
-1. El administrador genera una invitación con token aleatorio, vencimiento y revocación. Solo se almacena su hash.
+1. El administrador genera una invitación con token aleatorio, vencimiento y revocación. El token se almacena en el esquema privado y no se expone salvo al administrador; todavía no se almacena como hash.
 2. El invitado verifica su correo mediante Auth.
 3. Ve las fichas permitidas para esa invitación y elige la suya.
 4. El servidor vincula la ficha en una transacción con restricción única y consume la invitación cuando corresponda.
-5. Para impedir que alguien reclame la ficha de un compañero, se recomienda preasignar el correo permitido o requerir aprobación del administrador para un enlace abierto. La modalidad queda pendiente.
+5. Para impedir que alguien reclame la ficha de un compañero, se recomienda preasignar el correo permitido o requerir aprobación del administrador para un enlace abierto. Se utiliza aprobación del administrador para el enlace compartido.
 
-Los tokens no se guardan en el repositorio ni en registros de analítica. No se enviará correo desde esta fase del proyecto. Antes de invitar a amigos hay que configurar correo/SMTP y URLs de retorno de desarrollo y Pages; el servicio de correo predeterminado de Supabase tiene restricciones de destinatarios y uso.
+Los tokens no se guardan en el repositorio. Gmail SMTP y las URL de retorno de Pages están configurados; la cuenta administradora confirmó el correo. El envío desde un Gmail personal es una solución temporal de prueba.
 
 ## Modelo relacional previsto
 
@@ -77,7 +79,7 @@ El requisito confirmado incluye al administrador del equipo. Su rol le permite g
 
 La aplicación necesita conservar una relación privada con el autor para impedir votos dobles y permitir correcciones, si se acuerdan. El operador con acceso a la base de datos podría consultar esa relación; no se promete anonimato criptográfico frente al dueño de la infraestructura. El administrador deportivo no recibirá ese acceso. Si la misma persona opera la infraestructura y administra el equipo, esa diferencia debe entenderse antes de usar datos reales.
 
-Para reducir inferencias por cambios de promedio, se propone publicar resultados al cerrar la ventana y exigir un mínimo de tres evaluadores por destinatario. Está pendiente de aprobación. Un grupo pequeño, el texto de un comentario o el contenido de una propuesta también pueden permitir conjeturas; quitar nombres no elimina esa posibilidad.
+El equipo eligió mostrar los resultados al llegar cada valoración, sin un mínimo de votos ni esperar al cierre. Un grupo pequeño, el texto de un comentario o el contenido de una propuesta también pueden permitir conjeturas; quitar nombres no elimina esa posibilidad.
 
 ## Promedios propuestos
 
@@ -117,7 +119,7 @@ Ejemplo confirmado de independencia: el administrador registra una amarilla para
 4. El jugador asigna un ajuste independiente a cada evento de ese destinatario. Se guarda una valoración por autor, destinatario y partido.
 5. El servidor calcula cada nota final y después el promedio colectivo; solo devuelve los resultados y datos que permitan las reglas de publicación y privacidad.
 
-La demo separa las dos vistas y ofrece sesiones simuladas para los ocho jugadores. Todas empiezan sin votos ni notas precargadas; el ranking aparece cuando se guardan valoraciones. Hay un torneo Grama 5 (fútbol 6) y dos partidos: Los primeros, 6–2, y Compas, 3–1, con sus eventos indicados por el usuario. Para esta prueba se habilitan los ocho participantes, y el primer partido tiene fecha 1 de noviembre de 2026. Los partidos creados en memoria alimentan tanto las estadísticas como los promedios de la plantilla y la titular. El selector de sesión no se incluirá como mecanismo de acceso en la versión con cuentas reales.
+La demo separa las dos vistas y ofrece sesiones simuladas para los ocho jugadores. Todas empiezan sin votos ni notas precargadas; el ranking aparece cuando se guardan valoraciones. Hay un torneo Grama 5 (fútbol 6) y dos partidos: Los primeros, 6–2, y Compas, 3–1, con sus eventos indicados por el usuario. En el primer partido participaron ocho jugadores; en el segundo, siete, sin Chris. Los partidos creados en memoria alimentan tanto las estadísticas como los promedios de la plantilla y la titular. El selector de sesión no se incluirá como mecanismo de acceso en la versión con cuentas reales.
 
 La portería en cero se asigna expresamente al participante que indique el administrador. No se restringe automáticamente al arquero ni se infiere únicamente del marcador final, que no representa el tiempo individual en cancha. Solo se admite una por jugador y partido. En la versión conectada habrá que definir cómo verificarla según participación y sustituciones.
 
@@ -145,7 +147,7 @@ El editor ofrece posiciones pulsables, un selector de jugador que deshabilita a 
 
 Las identidades se usan internamente para limitar un voto por persona. La función de presentación elimina el campo de autor de las propuestas anónimas; en producción esa eliminación y el control de acceso ocurrirán en el servidor. Las pruebas cubren conteos, reemplazos, empates, mezcla de torneos/modalidades, plantillas incompletas y posiciones de diferentes formaciones.
 
-La propuesta de cuentas, aprobación de fichas y desvinculación administrativa se detalla en [CUENTAS.md](CUENTAS.md); no está conectada a servicios reales en esta demo.
+La implementación de cuentas, aprobación de fichas y desvinculación administrativa se detalla en [CUENTAS.md](CUENTAS.md). La versión conectada y la simulación se muestran por separado.
 
 ## Primera versión conectada
 
