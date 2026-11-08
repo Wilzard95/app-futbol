@@ -20,7 +20,7 @@ Demostración navegable con el equipo, plantilla, torneo, marcador y eventos ind
 La plantilla tiene ocho jugadores. Las formaciones de fútbol 11 mantienen tres vacantes y no permiten guardar una titular incompleta. El autocompletado usa a Diego como portero y prioriza las posiciones indicadas.
 
 - Resumen y plantilla con promedios independientes por torneo.
-- Un único torneo, **Grama 5**, en modalidad fútbol 6; dos partidos: **vs. Los primeros, victoria 6–2**, con fecha pendiente, y **vs. Compas, victoria 3–1**, el 8 de noviembre de 2026.
+- Un único torneo, **Grama 5**, en modalidad fútbol 6; dos partidos: **vs. Los primeros, victoria 6–2**, el 1 de noviembre de 2026, y **vs. Compas, victoria 3–1**, el 8 de noviembre de 2026.
 - Contra Los primeros: tres goles de William, tres de Ricky, una amarilla a Ricky y una asistencia de William, Ricky y SEBAS. Contra Compas: goles de William, Ricky y Fabian VARGAS; asistencias de Ricky y Wilson; sin tarjetas.
 - Los ocho jugadores están habilitados como participantes de la simulación para poder valorar y ser valorados.
 - En «Partidos», vistas separadas de administrador y jugador. El administrador registra un partido, sus participantes y sus eventos; el jugador ingresa su nota general y sus ajustes personales.

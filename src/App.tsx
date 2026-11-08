@@ -145,7 +145,7 @@ export default function App() {
               <th scope="col">Jugador</th>
               <th scope="col">Partidos</th>
               <th scope="col">Promedio</th>
-              {full && <th scope="col">Cuenta</th>}
+              {full && <th scope="col">Sesión de prueba</th>}
             </tr>
           </thead>
           <tbody>
@@ -190,7 +190,7 @@ export default function App() {
                     <span
                       className={`account-status ${player.linked ? "linked" : ""}`}
                     >
-                      {player.linked ? "Simulada" : "Por vincular"}
+                      {player.linked ? "Disponible para simular" : "No disponible"}
                     </span>
                   </td>
                 )}
@@ -526,9 +526,9 @@ export default function App() {
               </div>
               {ratingsTable(true)}
               <div className="panel-footnote">
-                Los jugadores corresponden a la plantilla indicada. Las cuentas
-                de esta tabla son simuladas. La vinculación real se administra
-                en «Mi cuenta».
+                Esta tabla solo indica quiénes pueden usarse en la simulación;
+                no muestra qué cuentas reales están vinculadas. El administrador
+                puede revisar las fichas vinculadas en «Mi cuenta».
               </div>
             </section>
           )}

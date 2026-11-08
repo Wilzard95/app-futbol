@@ -54,7 +54,7 @@ export const matches: Match[] = [
     id: "vs-los-primeros",
     tournamentId: "grama-5",
     opponent: "Los primeros",
-    playedAt: null,
+    playedAt: "2026-11-01",
     goalsFor: 6,
     goalsAgainst: 2,
     // All eight are enabled as participants for the requested simulation.
