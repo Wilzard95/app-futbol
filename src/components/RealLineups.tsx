@@ -218,15 +218,25 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
             ))}
           </select>
         </label>
+      </div>
+      <h3>Votación del equipo</h3>
+      <p>
+        {voting.total} propuestas.{" "}
+        {voting.leaders.length
+          ? `Más elegida${voting.leaders.length > 1 ? "s" : ""}: ${voting.leaders.map((id) => getFormation(tour.format, id).name).join(", ")}.`
+          : "Aún no hay propuestas."}
+      </p>
+      <p>
+        {voting.entries
+          .map((e) => `${e.formation.name}: ${e.votes} (${e.percentage.toFixed(0)}%)`)
+          .join(" · ")}
+      </p>
+      <div className="account-form">
         <label>
-          Mi formación
+          Ver titular colectiva de
           <select
-            value={formationId}
-            onChange={(e) => {
-              setFormationId(e.target.value);
-              setPicks({});
-              setSlot("gk");
-            }}
+            value={collectiveForm.id}
+            onChange={(e) => setViewFormation(e.target.value)}
           >
             {formationCatalog[tour.format].map((f) => (
               <option key={f.id} value={f.id}>
@@ -236,9 +246,46 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
           </select>
         </label>
       </div>
+      <LineupPitch
+        formation={collectiveForm}
+        positions={consensus.positions}
+        players={players}
+        averages={all.averages}
+        caption="Titular colectiva"
+        showVotes
+        footer={`${consensus.proposalCount} propuestas en esta formación`}
+      />
+      {consensus.conflicts.length > 0 && (
+        <p>
+          Hay jugadores elegidos en varias posiciones:{" "}
+          {consensus.conflicts
+            .map((id) => players.find((p) => p.id === id)?.name)
+            .join(", ")}
+          .
+        </p>
+      )}
       {data.myPlayer && roster.includes(data.myPlayer) ? (
         <>
           <h3>Mi titular</h3>
+          <div className="account-form">
+            <label>
+              Mi formación
+              <select
+                value={formationId}
+                onChange={(e) => {
+                  setFormationId(e.target.value);
+                  setPicks({});
+                  setSlot("gk");
+                }}
+              >
+                {formationCatalog[tour.format].map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
           {players.length < form.slots.length && <p>Faltan {form.slots.length - players.length} jugadores en la plantilla para completar esta formación.</p>}
           <LineupPitch
             formation={form}
@@ -285,51 +332,6 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
         <p>Necesitas una ficha vinculada e inscrita en este torneo para proponer una titular.</p>
       )}
       <p role="status">{message}</p>
-      <h3>Votación del equipo</h3>
-      <p>
-        {voting.total} propuestas.{" "}
-        {voting.leaders.length
-          ? `Más elegida${voting.leaders.length > 1 ? "s" : ""}: ${voting.leaders.map((id) => getFormation(tour.format, id).name).join(", ")}.`
-          : "Aún no hay propuestas."}
-      </p>
-      <p>
-        {voting.entries
-          .map((e) => `${e.formation.name}: ${e.votes} (${e.percentage.toFixed(0)}%)`)
-          .join(" · ")}
-      </p>
-      <div className="account-form">
-        <label>
-          Ver titular colectiva de
-          <select
-            value={collectiveForm.id}
-            onChange={(e) => setViewFormation(e.target.value)}
-          >
-            {formationCatalog[tour.format].map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <LineupPitch
-        formation={collectiveForm}
-        positions={consensus.positions}
-        players={players}
-        averages={all.averages}
-        caption="Titular colectiva"
-        showVotes
-        footer={`${consensus.proposalCount} propuestas en esta formación`}
-      />
-      {consensus.conflicts.length > 0 && (
-        <p>
-          Hay jugadores elegidos en varias posiciones:{" "}
-          {consensus.conflicts
-            .map((id) => players.find((p) => p.id === id)?.name)
-            .join(", ")}
-          .
-        </p>
-      )}
       <h3>Propuestas anónimas</h3>
       {all.proposals.map((p, i) => {
         const f = getFormation(tour.format, p.formationId);
