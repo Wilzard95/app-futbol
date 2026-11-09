@@ -270,6 +270,13 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
               <tbody>
                 {data.players
                   .filter((player) => game.participants.includes(player.id))
+                  .sort((a, b) => {
+                    const aResult = results.find((item) => item.playerId === a.id);
+                    const bResult = results.find((item) => item.playerId === b.id);
+                    if (!aResult && bResult) return 1;
+                    if (aResult && !bResult) return -1;
+                    return (Number(bResult?.average ?? 0) - Number(aResult?.average ?? 0)) || a.name.localeCompare(b.name, "es");
+                  })
                   .map((player) => {
                     const result = results.find(
                       (item) => item.playerId === player.id,
