@@ -16,6 +16,7 @@ type Data = {
   myPlayer: string | null;
   players: Omit<Player, "linked">[];
   tournaments: Tournament[];
+  roster: Record<string, string[]>;
 };
 type Proposal = {
   id: string;
@@ -153,7 +154,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
         {message || "Cargando torneos…"}
       </section>
     );
-  const players: Player[] = data.players.map((p) => ({ ...p, linked: true }));
+  const players: Player[] = data.players.filter((p) => (data.roster[tid] ?? []).includes(p.id)).map((p) => ({ ...p, linked: true }));
   const roster = players.map((p) => p.id);
   const form = getFormation(tour.format, formationId);
   const proposals: LineupProposal[] = all.proposals.map((p) => ({
@@ -235,7 +236,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
           </select>
         </label>
       </div>
-      {data.myPlayer ? (
+      {data.myPlayer && roster.includes(data.myPlayer) ? (
         <>
           <h3>Mi titular</h3>
           {players.length < form.slots.length && <p>Faltan {form.slots.length - players.length} jugadores en la plantilla para completar esta formación.</p>}
@@ -281,7 +282,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
           </div>
         </>
       ) : (
-        <p>Vincula tu ficha para proponer una titular.</p>
+        <p>Necesitas una ficha vinculada e inscrita en este torneo para proponer una titular.</p>
       )}
       <p role="status">{message}</p>
       <h3>Votación del equipo</h3>

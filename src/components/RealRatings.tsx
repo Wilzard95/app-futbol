@@ -28,6 +28,7 @@ type Game = {
 type Data = {
   myPlayer: string | null;
   role: string;
+  roster: Record<string, string[]>;
   players: Player[];
   tournaments: { id: string; name: string }[];
   matches: Game[];
@@ -234,6 +235,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
           players={data.players}
           games={data.matches}
           tournaments={data.tournaments}
+          roster={data.roster}
           onRefresh={refreshSports}
         />
       )}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
+import TournamentRosterAdmin from "./TournamentRosterAdmin";
 type Player = { id: string; name: string; number: string; position: string };
 type Tournament = { id: string; name: string; format: number };
 type Game = {
@@ -12,7 +13,7 @@ type Game = {
   goalsAgainst: number;
   participants: string[];
 };
-type Data = { players: Player[]; tournaments: Tournament[]; matches: Game[] };
+type Data = { role: string; players: Player[]; tournaments: Tournament[]; matches: Game[]; roster: Record<string, string[]> };
 const client = supabase!;
 export default function RealOverview({
   onAccount,
@@ -117,7 +118,7 @@ export default function RealOverview({
       </section>
     );
   const games = data.matches.filter((g) => g.tournamentId === tid);
-  const players = [...data.players].sort(
+  const players = data.players.filter((p) => (data.roster[tid] ?? []).includes(p.id)).sort(
     (a, b) =>
       (averages[b.id] ?? -1) - (averages[a.id] ?? -1) ||
       a.name.localeCompare(b.name),
@@ -147,6 +148,13 @@ export default function RealOverview({
           </select>
         </label>
       </div>
+      {mode === "players" && data.role === "admin" && tid && (
+        <TournamentRosterAdmin tournament={tid} players={data.players} enrolled={data.roster[tid] ?? []} onRefresh={async () => {
+          const result = await client.rpc("sports_data");
+          if (result.error) throw result.error;
+          setData(result.data as Data);
+        }} />
+      )}
       {mode === "overview" && (
         <>
           <h3>Resultados</h3>
@@ -164,6 +172,7 @@ export default function RealOverview({
         </>
       )}
       <h3>{mode === "players" ? "Jugadores" : "Promedios del torneo"}</h3>
+      {players.length === 0 && <p>Aún no hay jugadores inscritos en este torneo.</p>}
       <div className="table-scroll">
         <table className="player-table">
           <thead>

@@ -14,6 +14,7 @@ set local role authenticated;
 select set_config('request.jwt.claim.sub','bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1',true);
 do $$ declare t uuid; t5 uuid; t11 uuid; m uuid; e uuid; yellow_match uuid; yellow_event uuid; begin
  t:=public.sports_create_tournament('Test',6::smallint);
+ perform public.sports_enroll_player(t,p) from unnest(array['test-rating-1','test-rating-2','p1','p2','p3','p4','p5','p6']) p;
  m:=public.sports_create_match(t,'Test',current_date,1::smallint,0::smallint,array['test-rating-1','test-rating-2']);
  perform public.sports_add_event(m,'test-rating-1','goal','');
  begin perform public.rating_submit(m,'test-rating-1',7,'[]','',null); raise exception 'closed rating accepted'; exception when raise_exception then if sqlerrm<>'Las valoraciones aún no están abiertas o el partido está cerrado' then raise; end if; end;
@@ -33,8 +34,10 @@ do $$ declare t uuid; t5 uuid; t11 uuid; m uuid; e uuid; yellow_match uuid; yell
  perform public.lineup_submit(t,'f6-2-2-1','{"gk":"p3","row-0-0":"p4","row-0-1":"p6","row-1-0":"p2","row-1-1":"p5","row-2-0":"p1"}');
  perform public.lineup_submit(t,'f6-2-2-1','{"gk":"p3","row-0-0":"p4","row-0-1":"p6","row-1-0":"p2","row-1-1":"p5","row-2-0":"p1"}');
  t5:=public.sports_create_tournament('Test 5',5::smallint);
+ perform public.sports_enroll_player(t5,p) from unnest(array['test-rating-1','p1','p2','p3','p4','p6']) p;
  perform public.lineup_submit(t5,'f5-2-2','{"gk":"p3","row-0-0":"p4","row-0-1":"p6","row-1-0":"p2","row-1-1":"p1"}');
  t11:=public.sports_create_tournament('Test 11',11::smallint);
+ perform public.sports_enroll_player(t11,p) from unnest(array['test-rating-1','test-rating-2','test-rating-3','p1','p2','p3','p4','p5','p6','p7','p8']) p;
  perform public.lineup_submit(t11,'f11-4-3-3','{"gk":"p3","row-0-0":"p4","row-0-1":"p6","row-0-2":"p2","row-0-3":"p5","row-1-0":"p1","row-1-1":"p7","row-1-2":"p8","row-2-0":"test-rating-1","row-2-1":"test-rating-2","row-2-2":"test-rating-3"}');
  begin perform public.lineup_submit(t5,'f6-2-2-1','{}'); raise exception 'wrong format accepted'; exception when raise_exception then if sqlerrm<>'Formación inválida para el torneo' then raise; end if; end;
  if jsonb_array_length(public.account_context(null)->'linkedAccounts')<2 then raise exception 'admin cannot review linked accounts'; end if;

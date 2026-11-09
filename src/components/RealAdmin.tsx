@@ -16,19 +16,18 @@ export default function RealAdmin({
   players,
   games,
   tournaments,
+  roster,
   onRefresh,
 }: {
   players: Player[];
   games: Game[];
   tournaments: Tournament[];
+  roster: Record<string, string[]>;
   onRefresh: () => Promise<void>;
 }) {
   const [name, setName] = useState("");
   const [format, setFormat] = useState("6");
   const [tournament, setTournament] = useState(tournaments[0]?.id ?? "");
-  const [playerName, setPlayerName] = useState("");
-  const [number, setNumber] = useState("");
-  const [position, setPosition] = useState("Volante");
   const [opponent, setOpponent] = useState("");
   const [date, setDate] = useState("");
   const [gf, setGf] = useState("0");
@@ -107,60 +106,10 @@ export default function RealAdmin({
     }
     setBusy(false);
   }
-  async function addPlayer(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await client.rpc("sports_add_player", {
-      player_name: playerName,
-      shirt_number: number,
-      player_position: position,
-    });
-    if (error) setMessage(error.message);
-    else {
-      setMessage("Jugador agregado.");
-      setPlayerName("");
-      setNumber("");
-      await onRefresh();
-    }
-    setBusy(false);
-  }
   return (
     <details className="panel connected-panel">
       <summary>Administrar torneos, partidos y acciones</summary>
-      <h3>Agregar jugador</h3>
-      <form className="account-form" onSubmit={addPlayer}>
-        <label>
-          Nombre
-          <input
-            required
-            maxLength={100}
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-          />
-        </label>
-        <label>
-          Dorsal
-          <input
-            required
-            maxLength={5}
-            value={number}
-            onChange={(e) => setNumber(e.target.value)}
-          />
-        </label>
-        <label>
-          Posición
-          <select
-            value={position}
-            onChange={(e) => setPosition(e.target.value)}
-          >
-            <option>Portero</option>
-            <option>Defensa</option>
-            <option>Volante</option>
-            <option>Delantero</option>
-          </select>
-        </label>
-        <button disabled={busy}>Agregar jugador</button>
-      </form>
+      <p>Para agregar jugadores a un torneo, abre Plantilla y selecciona el torneo.</p>
       <h3>Crear torneo</h3>
       <form className="account-form" onSubmit={createTournament}>
         <label>
@@ -189,7 +138,7 @@ export default function RealAdmin({
           <select
             required
             value={tournament}
-            onChange={(e) => setTournament(e.target.value)}
+            onChange={(e) => { setTournament(e.target.value); setSelected([]); }}
           >
             <option value="">Selecciona torneo</option>
             {tournaments.map((t) => (
@@ -241,7 +190,7 @@ export default function RealAdmin({
         </label>
         <fieldset>
           <legend>Jugadores participantes</legend>
-          {players.map((p) => (
+          {players.filter((p) => (roster[tournament] ?? []).includes(p.id)).map((p) => (
             <label key={p.id}>
               <input
                 type="checkbox"
