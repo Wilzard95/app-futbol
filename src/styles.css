@@ -297,6 +297,27 @@ nav {
   color: #52604f;
   font-weight: 500;
 }
+.header-account {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+  min-width: 0;
+  max-width: 50%;
+  padding: 7px 12px;
+  border-radius: 7px;
+  background: #edf3e6;
+  color: var(--green);
+  font-size: 11px;
+}
+.header-account span {
+  font-size: 9px;
+  color: #71815f;
+}
+.header-account strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .demo-pill {
   display: flex;
   align-items: center;

@@ -255,6 +255,38 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
             {data.tournaments.find((t) => t.id === game.tournamentId)?.name} ·{" "}
             {game.participants.length} participantes
           </p>
+          <h3>Promedios de este partido</h3>
+          <div className="table-scroll">
+            <table className="player-table">
+              <thead>
+                <tr>
+                  <th>Jugador</th>
+                  <th>Promedio</th>
+                  <th>Valoraciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.players
+                  .filter((player) => game.participants.includes(player.id))
+                  .map((player) => {
+                    const result = results.find(
+                      (item) => item.playerId === player.id,
+                    );
+                    return (
+                      <tr key={player.id}>
+                        <td>
+                          {player.name} · #{player.number}
+                        </td>
+                        <td>
+                          {result ? Number(result.average).toFixed(2) : "—"}
+                        </td>
+                        <td>{result?.count ?? 0}</td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
           <details>
             <summary>Acciones registradas ({game.events.length})</summary>
             {game.events.length === 0 && <p>No hay acciones registradas.</p>}

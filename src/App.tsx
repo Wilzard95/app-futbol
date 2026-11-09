@@ -31,6 +31,7 @@ import Account from "./components/Account";
 import RealRatings from "./components/RealRatings";
 import RealLineups from "./components/RealLineups";
 import RealOverview from "./components/RealOverview";
+import AccountHeader from "./components/AccountHeader";
 import LineupLab, { LineupOverview } from "./components/LineupLab";
 import { tournamentAverage } from "./domain/rules";
 import type { MatchEvent, Player } from "./domain/types";
@@ -297,7 +298,9 @@ export default function App() {
         <div className="sidebar-note">
           <LockKeyhole size={20} />
           <strong>Tu voz también juega.</strong>
-          <p>Las valoraciones y titulares reales no muestran quién las propone.</p>
+          <p>
+            Las valoraciones y titulares reales no muestran quién las propone.
+          </p>
           <span>Los resultados se publican al recibir cada voto</span>
         </div>
         <a
@@ -318,9 +321,7 @@ export default function App() {
           <div className="breadcrumb">
             {teamName} <span>/</span> <strong>{activeNav.label}</strong>
           </div>
-          <span className="demo-pill">
-            <span /> EN PRUEBA
-          </span>
+          <AccountHeader onOpen={() => setView("account")} />
         </header>
         <main id="main">
           <div className="page-heading">
@@ -358,152 +359,157 @@ export default function App() {
                 onAccount={() => setView("account")}
               />
               {import.meta.env.DEV && (
-              <details>
-                <summary>Ver resumen de la simulación</summary>
-                <section className="hero">
-                  <div className="hero-copy">
-                    <span className="hero-tag">
-                      <Trophy size={14} /> {tournament.season}{" "}
-                      <span>FÚTBOL {tournament.format}</span>
-                    </span>
-                    <h2>
-                      Un equipo.
-                      <br />
-                      Todas las voces.
-                    </h2>
-                    <p>
-                      El próximo gran partido empieza
-                      <br className="desktop-break" /> con lo que construimos
-                      juntos.
-                    </p>
-                    <button onClick={() => setView("lineup")}>
-                      Explorar la titular <ArrowRight size={17} />
-                    </button>
-                  </div>
-                  <div className="hero-art" aria-hidden="true">
-                    <div className="art-field">
-                      <div />
-                      <span />
-                      <i />
-                    </div>
-                    <span className="art-number">
-                      {String(tournament.format).padStart(2, "0")}
-                    </span>
-                    <span className="art-caption">AMIGOS. EQUIPO. FÚTBOL.</span>
-                  </div>
-                </section>
-                <section className="stats" aria-label="Estadísticas del torneo">
-                  <div>
-                    <span className="stat-icon">
-                      <CalendarDays size={20} />
-                    </span>
-                    <div>
-                      <span>Partidos jugados</span>
-                      <strong>
-                        {String(tournamentMatches.length).padStart(2, "0")}
-                      </strong>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="stat-icon">
-                      <Trophy size={20} />
-                    </span>
-                    <div>
-                      <span>Victorias</span>
-                      <strong>
-                        {String(wins).padStart(2, "0")}
-                        <small>
-                          {draws} empate{draws !== 1 ? "s" : ""}
-                        </small>
-                      </strong>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="stat-icon">
-                      <Target size={20} />
-                    </span>
-                    <div>
-                      <span>Goles a favor</span>
-                      <strong>{String(goals).padStart(2, "0")}</strong>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="stat-icon">
-                      <Users size={20} />
-                    </span>
-                    <div>
-                      <span>Jugadores con nota</span>
-                      <strong>
-                        {String(ratedPlayers.length).padStart(2, "0")}
-                      </strong>
-                    </div>
-                  </div>
-                </section>
-                <div className="overview-grid">
-                  <div className="left-column">
-                    <section className="panel">
-                      <div className="section-heading">
-                        <div>
-                          <h2>
-                            Los destacados <span>DEL TORNEO</span>
-                          </h2>
-                          <p>Promedio de sus partidos valorados.</p>
-                        </div>
-                        <button
-                          className="text-button"
-                          onClick={() => setView("players")}
-                        >
-                          Ver plantilla <ArrowRight size={15} />
-                        </button>
-                      </div>
-                      {ratingsTable()}
-                    </section>
-                    <section className="panel">
-                      <div className="section-heading">
-                        <div>
-                          <h2>Últimos resultados</h2>
-                          <p>Así viene el equipo.</p>
-                        </div>
-                        <span className="muted">
-                          <CalendarDays size={18} />
-                        </span>
-                      </div>
-                      {matchList()}
-                    </section>
-                  </div>
-                  <div className="right-column">
-                    <section className="panel lineup-panel">
-                      <div className="section-heading">
-                        <div>
-                          <h2>Titular colectiva</h2>
-                          <p>La formación y los jugadores más elegidos.</p>
-                        </div>
-                        <Vote size={20} />
-                      </div>
-                      <LineupOverview
-                        tournament={tournament}
-                        players={players}
-                        averages={playerAverages}
-                        proposals={lineups}
-                      />
-                      <button
-                        className="lineup-button"
-                        onClick={() => setView("lineup")}
-                      >
-                        Ver todas las propuestas <ArrowRight size={16} />
-                      </button>
-                    </section>
-                    <div className="privacy-note">
-                      <LockKeyhole size={17} />
+                <details>
+                  <summary>Ver resumen de la simulación</summary>
+                  <section className="hero">
+                    <div className="hero-copy">
+                      <span className="hero-tag">
+                        <Trophy size={14} /> {tournament.season}{" "}
+                        <span>FÚTBOL {tournament.format}</span>
+                      </span>
+                      <h2>
+                        Un equipo.
+                        <br />
+                        Todas las voces.
+                      </h2>
                       <p>
-                        <strong>La confianza también se entrena.</strong> El
-                        diseño protege la autoría incluso frente al
-                        administrador del equipo.
+                        El próximo gran partido empieza
+                        <br className="desktop-break" /> con lo que construimos
+                        juntos.
                       </p>
+                      <button onClick={() => setView("lineup")}>
+                        Explorar la titular <ArrowRight size={17} />
+                      </button>
+                    </div>
+                    <div className="hero-art" aria-hidden="true">
+                      <div className="art-field">
+                        <div />
+                        <span />
+                        <i />
+                      </div>
+                      <span className="art-number">
+                        {String(tournament.format).padStart(2, "0")}
+                      </span>
+                      <span className="art-caption">
+                        AMIGOS. EQUIPO. FÚTBOL.
+                      </span>
+                    </div>
+                  </section>
+                  <section
+                    className="stats"
+                    aria-label="Estadísticas del torneo"
+                  >
+                    <div>
+                      <span className="stat-icon">
+                        <CalendarDays size={20} />
+                      </span>
+                      <div>
+                        <span>Partidos jugados</span>
+                        <strong>
+                          {String(tournamentMatches.length).padStart(2, "0")}
+                        </strong>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="stat-icon">
+                        <Trophy size={20} />
+                      </span>
+                      <div>
+                        <span>Victorias</span>
+                        <strong>
+                          {String(wins).padStart(2, "0")}
+                          <small>
+                            {draws} empate{draws !== 1 ? "s" : ""}
+                          </small>
+                        </strong>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="stat-icon">
+                        <Target size={20} />
+                      </span>
+                      <div>
+                        <span>Goles a favor</span>
+                        <strong>{String(goals).padStart(2, "0")}</strong>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="stat-icon">
+                        <Users size={20} />
+                      </span>
+                      <div>
+                        <span>Jugadores con nota</span>
+                        <strong>
+                          {String(ratedPlayers.length).padStart(2, "0")}
+                        </strong>
+                      </div>
+                    </div>
+                  </section>
+                  <div className="overview-grid">
+                    <div className="left-column">
+                      <section className="panel">
+                        <div className="section-heading">
+                          <div>
+                            <h2>
+                              Los destacados <span>DEL TORNEO</span>
+                            </h2>
+                            <p>Promedio de sus partidos valorados.</p>
+                          </div>
+                          <button
+                            className="text-button"
+                            onClick={() => setView("players")}
+                          >
+                            Ver plantilla <ArrowRight size={15} />
+                          </button>
+                        </div>
+                        {ratingsTable()}
+                      </section>
+                      <section className="panel">
+                        <div className="section-heading">
+                          <div>
+                            <h2>Últimos resultados</h2>
+                            <p>Así viene el equipo.</p>
+                          </div>
+                          <span className="muted">
+                            <CalendarDays size={18} />
+                          </span>
+                        </div>
+                        {matchList()}
+                      </section>
+                    </div>
+                    <div className="right-column">
+                      <section className="panel lineup-panel">
+                        <div className="section-heading">
+                          <div>
+                            <h2>Titular colectiva</h2>
+                            <p>La formación y los jugadores más elegidos.</p>
+                          </div>
+                          <Vote size={20} />
+                        </div>
+                        <LineupOverview
+                          tournament={tournament}
+                          players={players}
+                          averages={playerAverages}
+                          proposals={lineups}
+                        />
+                        <button
+                          className="lineup-button"
+                          onClick={() => setView("lineup")}
+                        >
+                          Ver todas las propuestas <ArrowRight size={16} />
+                        </button>
+                      </section>
+                      <div className="privacy-note">
+                        <LockKeyhole size={17} />
+                        <p>
+                          <strong>La confianza también se entrena.</strong> El
+                          diseño protege la autoría incluso frente al
+                          administrador del equipo.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </details>
+                </details>
               )}
             </>
           )}
@@ -515,31 +521,31 @@ export default function App() {
                 onAccount={() => setView("account")}
               />
               {import.meta.env.DEV && (
-              <details>
-                <summary>Ver plantilla de la simulación</summary>
-                <section className="panel">
-                  <div className="section-heading">
-                    <div>
-                      <h2>
-                        Plantilla del equipo{" "}
-                        <span>{players.length} JUGADORES</span>
-                      </h2>
-                      <p>
-                        Notas de {tournament.name}. Sin valoraciones se muestra
-                        «—».
-                      </p>
+                <details>
+                  <summary>Ver plantilla de la simulación</summary>
+                  <section className="panel">
+                    <div className="section-heading">
+                      <div>
+                        <h2>
+                          Plantilla del equipo{" "}
+                          <span>{players.length} JUGADORES</span>
+                        </h2>
+                        <p>
+                          Notas de {tournament.name}. Sin valoraciones se
+                          muestra «—».
+                        </p>
+                      </div>
+                      <Users size={21} />
                     </div>
-                    <Users size={21} />
-                  </div>
-                  {ratingsTable(true)}
-                  <div className="panel-footnote">
-                    Esta tabla solo indica quiénes pueden usarse en la
-                    simulación; no muestra qué cuentas reales están vinculadas.
-                    El administrador puede revisar las fichas vinculadas en «Mi
-                    cuenta».
-                  </div>
-                </section>
-              </details>
+                    {ratingsTable(true)}
+                    <div className="panel-footnote">
+                      Esta tabla solo indica quiénes pueden usarse en la
+                      simulación; no muestra qué cuentas reales están
+                      vinculadas. El administrador puede revisar las fichas
+                      vinculadas en «Mi cuenta».
+                    </div>
+                  </section>
+                </details>
               )}
             </>
           )}
@@ -547,48 +553,48 @@ export default function App() {
             <>
               <RealRatings onAccount={() => setView("account")} />
               {import.meta.env.DEV && (
-              <details>
-                <summary>Simulación de partidos (datos de prueba)</summary>
-                <section className="panel">
-                  <div className="section-heading">
+                <details>
+                  <summary>Simulación de partidos (datos de prueba)</summary>
+                  <section className="panel">
+                    <div className="section-heading">
+                      <div>
+                        <h2>{tournament.name}</h2>
+                        <p>
+                          Fútbol {tournament.format} · {tournament.season}
+                        </p>
+                      </div>
+                      <CalendarDays size={21} />
+                    </div>
+                    {matchList()}
+                  </section>
+                  <div className="info-banner">
+                    <CircleHelp size={20} />
                     <div>
-                      <h2>{tournament.name}</h2>
+                      <strong>
+                        Primero, la participación. Después, la valoración.
+                      </strong>
                       <p>
-                        Fútbol {tournament.format} · {tournament.season}
+                        El administrador registra el partido, quién jugó y sus
+                        eventos. Después cada participante elige su nota general
+                        y sus ajustes. El promedio se calcula a partir de las
+                        notas finales de todos.
                       </p>
                     </div>
-                    <CalendarDays size={21} />
                   </div>
-                  {matchList()}
-                </section>
-                <div className="info-banner">
-                  <CircleHelp size={20} />
-                  <div>
-                    <strong>
-                      Primero, la participación. Después, la valoración.
-                    </strong>
-                    <p>
-                      El administrador registra el partido, quién jugó y sus
-                      eventos. Después cada participante elige su nota general y
-                      sus ajustes. El promedio se calcula a partir de las notas
-                      finales de todos.
-                    </p>
-                  </div>
-                </div>
-                <MatchRatingsDemo
-                  key={tournamentId}
-                  tournamentId={tournamentId}
-                  matches={tournamentMatches}
-                  players={players}
-                  events={events}
-                  ballots={ratings}
-                  onEventsChange={updateEvents}
-                  onBallotsChange={setRatings}
-                  onMatchCreate={(match) =>
-                    setMatches((current) => [match, ...current])
-                  }
-                />
-              </details>
+                  <MatchRatingsDemo
+                    key={tournamentId}
+                    tournamentId={tournamentId}
+                    matches={tournamentMatches}
+                    players={players}
+                    events={events}
+                    ballots={ratings}
+                    onEventsChange={updateEvents}
+                    onBallotsChange={setRatings}
+                    onMatchCreate={(match) =>
+                      setMatches((current) => [match, ...current])
+                    }
+                  />
+                </details>
               )}
             </>
           )}
@@ -596,17 +602,17 @@ export default function App() {
             <>
               <RealLineups onAccount={() => setView("account")} />
               {import.meta.env.DEV && (
-              <details>
-                <summary>Simulación de titulares (datos de prueba)</summary>
-                <LineupLab
-                  key={tournamentId}
-                  tournament={tournament}
-                  players={players}
-                  averages={playerAverages}
-                  proposals={lineups}
-                  onProposalsChange={setLineups}
-                />
-              </details>
+                <details>
+                  <summary>Simulación de titulares (datos de prueba)</summary>
+                  <LineupLab
+                    key={tournamentId}
+                    tournament={tournament}
+                    players={players}
+                    averages={playerAverages}
+                    proposals={lineups}
+                    onProposalsChange={setLineups}
+                  />
+                </details>
               )}
             </>
           )}
