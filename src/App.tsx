@@ -293,14 +293,6 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="sidebar-note">
-          <LockKeyhole size={20} />
-          <strong>Tu voz también juega.</strong>
-          <p>
-            Las valoraciones y titulares reales no muestran quién las propone.
-          </p>
-          <span>Los resultados se publican al recibir cada voto</span>
-        </div>
         <a
           className="source-link"
           href="https://github.com/Wilzard95/app-futbol"
@@ -319,7 +311,7 @@ export default function App() {
           <div className="breadcrumb">
             {team?.name ?? "Mi equipo"} <span>/</span> <strong>{activeNav.label}</strong>
           </div>
-          <AccountHeader key={`header-${team?.id}`} onOpen={() => setView("account")} />
+          <AccountHeader key={`header-${team?.id}`} teamId={team?.id ?? ""} onOpen={() => setView("account")} />
         </header>
         <main id="main">
           <div className="page-heading">
@@ -358,6 +350,7 @@ export default function App() {
             <>
               <RealOverview
                 key={`overview-${team?.id}`}
+                teamId={team?.id ?? ""}
                 mode="overview"
                 onAccount={() => setView("account")}
               />
@@ -521,6 +514,7 @@ export default function App() {
             <>
               <RealOverview
                 key={`players-${team?.id}`}
+                teamId={team?.id ?? ""}
                 mode="players"
                 onAccount={() => setView("account")}
               />
@@ -605,7 +599,7 @@ export default function App() {
           )}
           {view === "lineup" && (
             <>
-              <RealLineups key={`lineup-${team?.id}`} onAccount={() => setView("account")} />
+              <RealLineups key={`lineup-${team?.id}`} teamId={team?.id ?? ""} onAccount={() => setView("account")} />
               {import.meta.env.DEV && (
                 <details>
                   <summary>Simulación de titulares (datos de prueba)</summary>
@@ -621,7 +615,7 @@ export default function App() {
               )}
             </>
           )}
-          {view === "account" && <Account key={`account-${team?.id}`} hasTeam={!!team} />}
+          {view === "account" && <Account key={`account-${team?.id}`} hasTeam={!!team} teamId={team?.id ?? ""} />}
 
           <footer className="page-footer">
             <span>

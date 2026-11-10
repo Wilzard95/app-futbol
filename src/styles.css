@@ -182,6 +182,21 @@ select {
   background: #eff3e8;
   border-radius: 8px;
 }
+.team-crest img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+.crest-upload, .visual-upload { display: inline-block; color: #527443; font-size: 11px; font-weight: 700; cursor: pointer; margin: 3px 4px 8px; }
+.crest-upload input, .visual-upload input { display: block; width: 100%; max-width: 190px; margin-top: 5px; color: #647969; font-size: 10px; }
+.profile-visual-editor { padding: 8px 18px 18px; margin: 20px 0; border: 1px solid #dce9d6; border-radius: 14px; background: #f7faf4; }
+.profile-visual-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-bottom: 18px; }
+.profile-photo, .profile-photo-placeholder, .profile-avatar-preview { width: 110px; height: 110px; border-radius: 18px; object-fit: cover; display: block; }
+.profile-photo-placeholder { display: grid; place-items: center; background: #e8f0e2; color: #647969; font-size: 12px; }
+.avatar-option { display: grid; gap: 4px; margin-top: 8px; font-size: 12px; font-weight: 700; color: #405847; }
+.avatar-option select { max-width: 220px; border: 1px solid #dbe5d5; border-radius: 8px; background: white; padding: 8px; }
+.pitch-avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; background: #e7f2dd; }
+.header-profile-photo { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; grid-row: 1 / span 2; grid-column: 1; }
+.header-account:has(.header-profile-photo) { grid-template-columns: 28px minmax(0,1fr); align-items: center; column-gap: 8px; }
+.roster-player { display: inline-flex; align-items: center; gap: 8px; }
+.roster-portrait { width: 30px; height: 30px; object-fit: cover; border-radius: 50%; }
+@media (max-width: 480px) { .profile-visual-grid { grid-template-columns: 1fr; } }
 .team-card strong {
   font-size: 12px;
 }

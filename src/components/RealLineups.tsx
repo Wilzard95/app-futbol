@@ -11,6 +11,8 @@ import {
 } from "../domain/lineups";
 import type { Format, LineupProposal, Player } from "../domain/types";
 import LineupPitch from "./LineupPitch";
+import { rawSupabase } from "../supabase";
+import type { Visuals } from "../domain/visuals";
 type Tournament = { id: string; name: string; format: Format };
 type Data = {
   myPlayer: string | null;
@@ -29,7 +31,7 @@ type LineupData = {
   averages: Record<string, number>;
 };
 const client = supabase!;
-export default function RealLineups({ onAccount }: { onAccount: () => void }) {
+export default function RealLineups({ onAccount, teamId }: { onAccount: () => void; teamId: string }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState<Data | null>(null);
@@ -41,6 +43,12 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [viewFormation, setViewFormation] = useState("");
+  const [visuals, setVisuals] = useState<Visuals | null>(null);
+  useEffect(() => {
+    let active = true;
+    if (teamId && session) void rawSupabase!.rpc("multi_visuals", { team: teamId }).then(({ data, error }) => { if (active && !error) setVisuals(data as Visuals); });
+    return () => { active = false; };
+  }, [teamId, session?.user.id]);
   useEffect(() => {
     let active = true;
     client.auth.getSession().then(({ data }) => {
@@ -154,7 +162,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
         {message || "Cargando torneos…"}
       </section>
     );
-  const players: Player[] = data.players.filter((p) => (data.roster[tid] ?? []).includes(p.id)).map((p) => ({ ...p, linked: true }));
+  const players: Player[] = data.players.filter((p) => (data.roster[tid] ?? []).includes(p.id)).map((p) => ({ ...p, linked: true, avatar: visuals?.players[p.id]?.avatar ?? null }));
   const roster = players.map((p) => p.id);
   const form = getFormation(tour.format, formationId);
   const proposals: LineupProposal[] = all.proposals.map((p) => ({

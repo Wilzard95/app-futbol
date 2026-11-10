@@ -18,6 +18,8 @@ export interface Player {
   number: string;
   position: string;
   linked: boolean;
+  avatar?: import("./visuals").AvatarStyle | null;
+  photo?: string | null;
 }
 
 export interface Tournament {

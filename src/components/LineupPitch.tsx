@@ -1,4 +1,5 @@
 import type { Formation, Player, Slot } from "../domain/types";
+import AvatarFigure from "./AvatarFigure";
 
 export type PitchPosition = Slot & { winners: string[]; votes: number };
 
@@ -55,7 +56,7 @@ export default function LineupPitch({
                         <span className="pitch-rating">
                           {averages[id] == null ? "—" : averages[id].toFixed(1)}
                         </span>
-                        <span className="shirt">{player.number}</span>
+                        {player.avatar ? <AvatarFigure avatar={player.avatar} className="pitch-avatar" /> : <span className="shirt">{player.number}</span>}
                         <span className="pitch-name">
                           {player.name.split(" ")[0]}
                         </span>

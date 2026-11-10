@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
 import { appBaseUrl } from "../domain/app-url";
+import ProfileVisualEditor from "./ProfileVisualEditor";
 
 type Player = {
   id: string;
@@ -37,7 +38,7 @@ const redirect = () => {
   return url.href;
 };
 
-export default function Account({ hasTeam = true }: { hasTeam?: boolean }) {
+export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boolean; teamId?: string }) {
   const [session, setSession] = useState<Session | null>(null);
   const [context, setContext] = useState<Context | null>(null);
   const [email, setEmail] = useState("");
@@ -253,6 +254,7 @@ export default function Account({ hasTeam = true }: { hasTeam?: boolean }) {
               </strong>
             </p>
           )}
+          {context.playerId && <ProfileVisualEditor team={teamId} player={context.playerId} />}
           {context.pending && (
             <>
               <p>Solicitud pendiente de aprobación.</p>

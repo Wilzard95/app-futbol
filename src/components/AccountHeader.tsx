@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "../supabase";
+import { rawSupabase, supabase } from "../supabase";
+import type { Visuals } from "../domain/visuals";
 
-export default function AccountHeader({ onOpen }: { onOpen: () => void }) {
+export default function AccountHeader({ onOpen, teamId }: { onOpen: () => void; teamId: string }) {
   const [session, setSession] = useState<Session | null>(null);
   const [name, setName] = useState("");
+  const [photo, setPhoto] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     let active = true;
@@ -35,7 +37,7 @@ export default function AccountHeader({ onOpen }: { onOpen: () => void }) {
     const load = () =>
       supabase!
         .rpc("account_context", { invite_code: null })
-        .then(({ data, error }) => {
+        .then(async ({ data, error }) => {
           if (!active || error || !data) return;
           const profile = data as {
             playerId: string | null;
@@ -45,6 +47,10 @@ export default function AccountHeader({ onOpen }: { onOpen: () => void }) {
             profile.players.find((player) => player.id === profile.playerId)
               ?.name ?? "",
           );
+          if (profile.playerId && teamId) {
+            const result = await rawSupabase!.rpc("multi_visuals", { team: teamId });
+            if (active && !result.error) setPhoto((result.data as Visuals).players[profile.playerId]?.photo ?? null);
+          } else setPhoto(null);
         });
     void load();
     const timer = window.setInterval(() => void load(), 10000);
@@ -62,6 +68,7 @@ export default function AccountHeader({ onOpen }: { onOpen: () => void }) {
     >
       {session ? (
         <>
+          {photo && <img className="header-profile-photo" src={photo} alt="" />}
           <span>Mi cuenta</span>
           <strong>{name || session.user.email || "Cuenta"}</strong>
         </>

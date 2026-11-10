@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "../supabase";
+import { rawSupabase, supabase } from "../supabase";
+import type { Visuals } from "../domain/visuals";
+import AvatarFigure from "./AvatarFigure";
 import TournamentRosterAdmin from "./TournamentRosterAdmin";
 import { tournamentPlayerStats } from "../domain/player-stats";
 import type { MatchEventKind } from "../domain/types";
@@ -21,9 +23,11 @@ const client = supabase!;
 export default function RealOverview({
   onAccount,
   mode,
+  teamId,
 }: {
   onAccount: () => void;
   mode: "overview" | "players";
+  teamId: string;
 }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -31,6 +35,7 @@ export default function RealOverview({
   const [tid, setTid] = useState("");
   const [averages, setAverages] = useState<Record<string, number>>({});
   const [message, setMessage] = useState("");
+  const [visuals, setVisuals] = useState<Visuals | null>(null);
   useEffect(() => {
     let active = true;
     client.auth.getSession().then(({ data }) => {
@@ -81,6 +86,13 @@ export default function RealOverview({
       clearInterval(timer);
     };
   }, [session?.user.id]);
+  useEffect(() => {
+    let active = true;
+    if (!session || !teamId) return;
+    const load = () => { void rawSupabase!.rpc("multi_visuals", { team: teamId }).then(({ data, error }) => { if (active && !error) setVisuals(data as Visuals); }); };
+    load(); const timer = window.setInterval(load, 10000);
+    return () => { active = false; clearInterval(timer); };
+  }, [session?.user.id, teamId]);
   useEffect(() => {
     if (!tid || !session) return;
     let active = true;
@@ -191,9 +203,7 @@ export default function RealOverview({
               const stats = tournamentPlayerStats(p.id, games);
               return (
               <tr key={p.id}>
-                <td>
-                  {p.name} · #{p.number} · {p.position}
-                </td>
+                <td><span className="roster-player">{visuals?.players[p.id]?.photo ? <img className="roster-portrait" src={visuals.players[p.id].photo!} alt="" /> : visuals?.players[p.id]?.avatar ? <AvatarFigure className="roster-portrait" avatar={visuals.players[p.id].avatar!} /> : null}<span>{p.name} · #{p.number} · {p.position}</span></span></td>
                 <td>
                   {stats.matches}
                 </td>
