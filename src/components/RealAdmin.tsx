@@ -25,8 +25,6 @@ export default function RealAdmin({
   roster: Record<string, string[]>;
   onRefresh: () => Promise<void>;
 }) {
-  const [name, setName] = useState("");
-  const [format, setFormat] = useState("6");
   const [tournament, setTournament] = useState(tournaments[0]?.id ?? "");
   const [opponent, setOpponent] = useState("");
   const [date, setDate] = useState("");
@@ -40,22 +38,6 @@ export default function RealAdmin({
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const game = games.find((g) => g.id === match);
-  async function createTournament(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { data, error } = await client.rpc("sports_create_tournament", {
-      tournament_name: name,
-      game_format: Number(format),
-    });
-    if (error) setMessage(error.message);
-    else {
-      setMessage("Torneo creado.");
-      setName("");
-      await onRefresh();
-      setTournament(String(data));
-    }
-    setBusy(false);
-  }
   async function createMatch(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -108,29 +90,8 @@ export default function RealAdmin({
   }
   return (
     <details className="panel connected-panel">
-      <summary>Administrar torneos, partidos y acciones</summary>
+      <summary>Administrar partidos y acciones</summary>
       <p>Para agregar jugadores a un torneo, abre Plantilla y selecciona el torneo.</p>
-      <h3>Crear torneo</h3>
-      <form className="account-form" onSubmit={createTournament}>
-        <label>
-          Nombre
-          <input
-            required
-            maxLength={100}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-        <label>
-          Modalidad
-          <select value={format} onChange={(e) => setFormat(e.target.value)}>
-            <option value="5">Fútbol 5</option>
-            <option value="6">Fútbol 6</option>
-            <option value="11">Fútbol 11</option>
-          </select>
-        </label>
-        <button disabled={busy}>Crear torneo</button>
-      </form>
       <h3>Registrar partido</h3>
       <form className="account-form" onSubmit={createMatch}>
         <label>
