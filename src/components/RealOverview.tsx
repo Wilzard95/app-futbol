@@ -6,6 +6,10 @@ import { Shield } from "lucide-react";
 import TournamentRosterAdmin from "./TournamentRosterAdmin";
 import { tournamentPlayerStats } from "../domain/player-stats";
 import type { MatchEventKind } from "../domain/types";
+import { defaultAvatar } from "../domain/visuals";
+import type { AvatarStyle } from "../domain/visuals";
+import AvatarFigure from "./AvatarFigure";
+type Coach = { id: string; name: string; photo: string | null; avatar: AvatarStyle | null };
 type Player = { id: string; name: string; number: string; position: string };
 type Tournament = { id: string; name: string; format: number };
 type Game = {
@@ -37,7 +41,15 @@ export default function RealOverview({
   const [tid, setTid] = useState("");
   const [averages, setAverages] = useState<Record<string, number>>({});
   const [message, setMessage] = useState("");
+  const [coaches, setCoaches] = useState<Coach[]>([]);
   const visuals = useTeamVisuals();
+  useEffect(() => {
+    let active = true; setCoaches([]);
+    if (!session || mode !== "players" || !teamId) return;
+    const load = () => { void client.rpc("multi_coach_visuals", { team: teamId }).then(({ data, error }) => { if (active && !error) setCoaches(data as Coach[]); }); };
+    load(); const timer = window.setInterval(load, 10000);
+    return () => { active = false; clearInterval(timer); };
+  }, [teamId, session?.user.id, mode]);
   useEffect(() => {
     let active = true;
     client.auth.getSession().then(({ data }) => {
@@ -219,6 +231,10 @@ export default function RealOverview({
         Cada partido valorado aporta el mismo peso al promedio del torneo.
         {mode === "overview" && " Los goles por partido se calculan dividiendo los goles entre los partidos jugados en este torneo."}
       </p>
+      {mode === "players" && <section className="roster-coaches"><h3>Entrenadores</h3>
+        {coaches.length === 0 ? <p>Aún no hay entrenadores en este equipo.</p> : <div className="roster-coach-list">{coaches.map(coach => <div className="roster-coach-card" key={coach.id}><span className="player-face" aria-hidden="true"><AvatarFigure avatar={coach.avatar ?? defaultAvatar} photo={coach.photo} /></span><strong>{coach.name}</strong></div>)}</div>}
+      </section>}
     </section>
   );
 }
+
