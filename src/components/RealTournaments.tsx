@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { rawSupabase, supabase } from "../supabase";
 import type { Team } from "./TeamSelector";
+import TournamentRosterAdmin from "./TournamentRosterAdmin";
 
 type Tournament = { id: string; name: string; format: number };
-type SportsData = { role: string; tournaments: Tournament[] };
+type SportsData = { role: string; tournaments: Tournament[]; players: { id: string; name: string; number: string; retiredFromTeam?: boolean }[]; roster: Record<string, string[]> };
 const client = supabase!;
 
 export default function RealTournaments({ onAccount, team, teams, onSelectTeam }: { onAccount: () => void; team: Team | null; teams: Team[]; onSelectTeam: (team: Team) => void }) {
@@ -41,7 +42,7 @@ export default function RealTournaments({ onAccount, team, teams, onSelectTeam }
       setName("");
       const result = await client.rpc("sports_data");
       if (result.error) setMessage("Torneo creado. Recarga la página para actualizar la lista.");
-      else { setData(result.data as SportsData); setMessage("Torneo creado. Ahora puedes inscribir sus jugadores en Plantilla."); }
+      else { setData(result.data as SportsData); setMessage("Torneo creado. Ahora puedes inscribir a sus jugadores aquí."); }
     } catch { setMessage("No se pudo conectar. Inténtalo de nuevo."); }
     finally { setBusy(false); }
   }
@@ -76,7 +77,9 @@ export default function RealTournaments({ onAccount, team, teams, onSelectTeam }
     <h3>Torneos del equipo</h3>
     {data.tournaments.length === 0 && <p>Aún no hay torneos.</p>}
     {data.tournaments.map(t => <div className="tournament-entry" key={t.id}><div className="account-request"><strong>{t.name}</strong><span>Fútbol {t.format}</span>{data.role === "admin" && <button type="button" className="tournament-delete-toggle" aria-expanded={deleting === t.id} onClick={() => { setDeleting(deleting === t.id ? null : t.id); setConfirmation(""); }}>Eliminar torneo</button>}</div>
+      {data.role === "admin" && team && <TournamentRosterAdmin tournament={t.id} teamId={team.id} players={data.players.filter(p => !p.retiredFromTeam)} enrolled={data.roster[t.id] ?? []} onRefresh={async () => { const result = await client.rpc("sports_data"); if (result.error) throw result.error; setData(result.data as SportsData); }} />}
       {deleting === t.id && <div className="delete-team-panel tournament-delete-panel"><div className="delete-team-warning"><strong>Esta acción es permanente.</strong><p>Se eliminarán los partidos, acciones, valoraciones, comentarios y titulares de este torneo. Los jugadores y sus cuentas seguirán en el equipo; los demás torneos no se modificarán.</p></div><label>Escribe <strong>{t.name}</strong> para confirmar<input value={confirmation} onChange={e => setConfirmation(e.target.value)} autoComplete="off" /></label><button type="button" className="delete-team-button" disabled={busy || confirmation !== t.name} onClick={() => void deleteTournament(t)}>Eliminar torneo definitivamente</button></div>}
     </div>)}
   </section>;
 }
+
