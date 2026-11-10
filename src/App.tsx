@@ -616,7 +616,7 @@ export default function App() {
               )}
             </>
           )}
-          {view === "account" && <Account key={`account-${team?.id}`} hasTeam={!!team} teamId={team?.id ?? ""} />}
+          {view === "account" && <Account key={`account-${team?.id}`} hasTeam={!!team} teamId={team?.id ?? ""} teamName={team?.name ?? ""} />}
 
           <footer className="page-footer">
             <span>

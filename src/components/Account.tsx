@@ -40,7 +40,7 @@ const redirect = () => {
   return url.href;
 };
 
-export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boolean; teamId?: string }) {
+export default function Account({ hasTeam = true, teamId = "", teamName = "" }: { hasTeam?: boolean; teamId?: string; teamName?: string }) {
   const [session, setSession] = useState<Session | null>(null);
   const [context, setContext] = useState<Context | null>(null);
   const [email, setEmail] = useState("");
@@ -49,6 +49,7 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
   const [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState("");
   const [teamRoles, setTeamRoles] = useState<TeamRoleEntry[] | null>(null);
+  const [deleteName, setDeleteName] = useState("");
   const [recovery, setRecovery] = useState(() =>
     new URLSearchParams(location.search).has("recovery"),
   );
@@ -97,6 +98,17 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
       if (!result.error) setTeamRoles(result.data as TeamRoleEntry[]);
       setMessage(makeAdmin ? `${member.name ?? "La cuenta"} ahora es administrador del equipo.` : `Se retiró el permiso de administrador de ${member.name ?? "la cuenta"}.`);
     } catch { setMessage("No se pudo conectar. Inténtalo de nuevo."); }
+    finally { setBusy(false); }
+  }
+  async function deleteTeam() {
+    if (deleteName !== teamName) return;
+    if (!window.confirm(`¿Eliminar definitivamente «${teamName}»? También se eliminarán sus torneos, partidos, valoraciones, titulares y demás datos del equipo. Esta acción no se puede deshacer.`)) return;
+    setBusy(true); setMessage("");
+    try {
+      const { error } = await rawSupabase!.rpc("multi_delete_team", { team: teamId, confirmation: deleteName });
+      if (error) { setMessage(error.message); return; }
+      window.location.replace(window.location.pathname);
+    } catch { setMessage("No se pudo conectar. Comprueba tu equipo antes de volver a intentarlo."); }
     finally { setBusy(false); }
   }
   async function run(
@@ -432,6 +444,12 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
                   {!member.owner && member.playerId && <button type="button" disabled={busy} onClick={() => void setAdministrator(member, member.role !== "admin")}>{member.role === "admin" ? "Quitar permiso de admin" : "Dar permiso de admin"}</button>}
                 </div>)}
               </section>}
+              {teamRoles?.some(member => member.owner) && <details className="delete-team-panel">
+                <summary>Eliminar equipo</summary>
+                <div className="delete-team-warning"><strong>Esta acción es permanente.</strong><p>Al eliminar «{teamName}» también se eliminarán sus torneos, partidos, acciones, valoraciones, comentarios, titulares, fichas, invitaciones y demás datos del equipo. Las cuentas de los jugadores y sus otros equipos no se eliminarán.</p></div>
+                <label>Escribe <strong>{teamName}</strong> para confirmar<input value={deleteName} onChange={e => setDeleteName(e.target.value)} autoComplete="off" /></label>
+                <button type="button" className="delete-team-button" disabled={busy || deleteName !== teamName || !teamName} onClick={() => void deleteTeam()}>Eliminar equipo definitivamente</button>
+              </details>}
             </>
           )}
         </>
