@@ -92,7 +92,7 @@ export default function RealAdmin({
   return (
     <details className="panel connected-panel">
       <summary>Agregar partido</summary>
-      <p>Para agregar jugadores a un torneo, abre Plantilla y selecciona el torneo.</p>
+      <p>Para inscribir jugadores en un torneo, abre Mis torneos y busca el torneo correspondiente.</p>
       <h3>Registrar partido</h3>
       <form className="account-form" onSubmit={createMatch}>
         <label>
@@ -231,3 +231,4 @@ export default function RealAdmin({
     </details>
   );
 }
+
