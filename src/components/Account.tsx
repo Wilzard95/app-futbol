@@ -4,6 +4,7 @@ import { rawSupabase, supabase } from "../supabase";
 import { appBaseUrl } from "../domain/app-url";
 import ProfileVisualEditor from "./ProfileVisualEditor";
 import { PlayerFace, PlayerPicker } from "./PlayerIdentity";
+import CoachPanel from "./CoachPanel";
 
 type Player = {
   id: string;
@@ -321,6 +322,7 @@ export default function Account({ hasTeam = true, teamId = "", teamName = "" }: 
               ficha.
             </p>
           )}
+          <CoachPanel teamId={teamId} invitation={token()} onChanged={refresh} />
           {context.role === "admin" && (
             <>
               <h3>Invitación al equipo</h3>
@@ -437,6 +439,10 @@ export default function Account({ hasTeam = true, teamId = "", teamName = "" }: 
                     )}
                   </div>
                 ))}
+              <h3>Fichas de jugador disponibles</h3>
+              <p>Estas fichas aún no tienen una cuenta vinculada ni una solicitud pendiente.</p>
+              {context.players.filter(p => !p.occupied && !context.claims.some(c => c.playerId === p.id)).map(p => <div className="account-request" key={p.id}><span className="player-identity"><PlayerFace id={p.id} />{p.name} · #{p.number} · {p.position}</span></div>)}
+              {!context.players.some(p => !p.occupied && !context.claims.some(c => c.playerId === p.id)) && <p>No hay fichas disponibles sin solicitud.</p>}
               {teamRoles && <section className="team-role-section"><h3>Administradores del equipo</h3>
                 <p>Como creador puedes dar o quitar permisos de administración a cuentas vinculadas. Un administrador puede gestionar jugadores, torneos, partidos, acciones e invitaciones.</p>
                 {teamRoles.map(member => <div className="account-request" key={member.userId}>
@@ -461,3 +467,4 @@ export default function Account({ hasTeam = true, teamId = "", teamName = "" }: 
     </section>
   );
 }
+
