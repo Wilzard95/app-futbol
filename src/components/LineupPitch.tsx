@@ -57,7 +57,7 @@ export default function LineupPitch({
                         <span className="pitch-rating">
                           {averages[id] == null ? "—" : averages[id].toFixed(1)}
                         </span>
-                        {player.avatar || player.photo ? <AvatarFigure avatar={player.avatar ?? defaultAvatar} photo={player.photo} className="pitch-avatar" /> : <span className="shirt">{player.number}</span>}
+                        <AvatarFigure avatar={player.avatar ?? defaultAvatar} photo={player.photo} className="pitch-avatar" />
                         <span className="pitch-name">
                           {player.name.split(" ")[0]}
                         </span>

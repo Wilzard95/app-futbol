@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { supabase } from "../supabase";
+import { PlayerPicker } from "./PlayerIdentity";
 
 type Player = { id: string; name: string; number: string };
 
@@ -35,9 +36,7 @@ export default function TournamentRosterAdmin({ tournament, players, enrolled, o
     <summary>＋ Agregar jugador al torneo</summary>
     <p>Inscriba una ficha existente o cree una nueva. La misma ficha puede participar en varios torneos.</p>
     {available.length > 0 && <form className="account-form roster-form" onSubmit={enroll}>
-      <label>Jugador del equipo<select required value={existing} onChange={e => setExisting(e.target.value)}>
-        <option value="">Selecciona un jugador</option>{available.map(p => <option key={p.id} value={p.id}>{p.name} · #{p.number}</option>)}
-      </select></label>
+      <PlayerPicker label="Jugador del equipo" players={available} value={existing} onChange={setExisting} />
       <button disabled={busy || !existing}>Inscribir jugador existente</button>
     </form>}
     <h3>Crear ficha nueva</h3>

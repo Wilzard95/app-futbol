@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { supabase } from "../supabase";
 import { eventRules } from "../domain/events";
 import type { MatchEventKind } from "../domain/types";
+import { PlayerFace, PlayerPicker } from "./PlayerIdentity";
 type Player = { id: string; name: string; number: string };
 type Game = {
   id: string;
@@ -164,7 +165,7 @@ export default function RealAdmin({
                   )
                 }
               />
-              {p.name} · #{p.number}
+              <PlayerFace id={p.id} /> {p.name} · #{p.number}
             </label>
           ))}
         </fieldset>
@@ -193,23 +194,7 @@ export default function RealAdmin({
             ))}
           </select>
         </label>
-        <label>
-          Jugador
-          <select
-            required
-            value={player}
-            onChange={(e) => setPlayer(e.target.value)}
-          >
-            <option value="">Selecciona participante</option>
-            {players
-              .filter((p) => game?.participants.includes(p.id))
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-          </select>
-        </label>
+        <PlayerPicker label="Jugador" players={players.filter(p => game?.participants.includes(p.id))} value={player} onChange={setPlayer} />
         <label>
           Acción
           <select

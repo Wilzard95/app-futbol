@@ -11,8 +11,7 @@ import {
 } from "../domain/lineups";
 import type { Format, LineupProposal, Player } from "../domain/types";
 import LineupPitch from "./LineupPitch";
-import { rawSupabase } from "../supabase";
-import type { Visuals } from "../domain/visuals";
+import { PlayerPicker, useTeamVisuals } from "./PlayerIdentity";
 type Tournament = { id: string; name: string; format: Format };
 type Data = {
   myPlayer: string | null;
@@ -31,7 +30,7 @@ type LineupData = {
   averages: Record<string, number>;
 };
 const client = supabase!;
-export default function RealLineups({ onAccount, teamId }: { onAccount: () => void; teamId: string }) {
+export default function RealLineups({ onAccount }: { onAccount: () => void }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState<Data | null>(null);
@@ -43,12 +42,7 @@ export default function RealLineups({ onAccount, teamId }: { onAccount: () => vo
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [viewFormation, setViewFormation] = useState("");
-  const [visuals, setVisuals] = useState<Visuals | null>(null);
-  useEffect(() => {
-    let active = true;
-    if (teamId && session) void rawSupabase!.rpc("multi_visuals", { team: teamId }).then(({ data, error }) => { if (active && !error) setVisuals(data as Visuals); });
-    return () => { active = false; };
-  }, [teamId, session?.user.id]);
+  const visuals = useTeamVisuals();
   useEffect(() => {
     let active = true;
     client.auth.getSession().then(({ data }) => {
@@ -305,26 +299,7 @@ export default function RealLineups({ onAccount, teamId }: { onAccount: () => vo
             onSelectPosition={setSlot}
           />
           <div className="account-form">
-            <label>
-              Jugador para {form.slots.find((s) => s.id === slot)?.label}
-              <select
-                value={picks[slot] ?? ""}
-                onChange={(e) => setPicks({ ...picks, [slot]: e.target.value })}
-              >
-                <option value="">Selecciona un jugador</option>
-                {players.map((p) => (
-                  <option
-                    key={p.id}
-                    value={p.id}
-                    disabled={Object.entries(picks).some(
-                      ([s, id]) => s !== slot && id === p.id,
-                    )}
-                  >
-                    {p.name} · #{p.number}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <PlayerPicker label={`Jugador para ${form.slots.find((s) => s.id === slot)?.label ?? "la posición"}`} players={players} value={picks[slot] ?? ""} onChange={id => setPicks({ ...picks, [slot]: id })} unavailable={Object.entries(picks).filter(([s]) => s !== slot).map(([, id]) => id)} />
             <button
               type="button"
               onClick={() => setPicks(suggestLineup(form, players))}

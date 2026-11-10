@@ -5,6 +5,7 @@ import { supabase } from "../supabase";
 import { eventRules } from "../domain/events";
 import RealAdmin from "./RealAdmin";
 import type { MatchEventKind } from "../domain/types";
+import { PlayerFace, PlayerPicker } from "./PlayerIdentity";
 
 type Player = { id: string; name: string; number: string };
 type Event = {
@@ -257,23 +258,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
             ))}
           </select>
         </label>
-        <label>
-          Jugador a valorar
-          <select
-            value={target}
-            disabled={!canRate}
-            onChange={(e) => setTarget(e.target.value)}
-          >
-            <option value="">Selecciona un participante</option>
-            {data.players
-              .filter((p) => game?.participants.includes(p.id))
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} · #{p.number}
-                </option>
-              ))}
-          </select>
-        </label>
+        <PlayerPicker label="Jugador a valorar" players={data.players.filter(p => game?.participants.includes(p.id))} value={target} onChange={setTarget} disabled={!canRate} />
       </div>
       {game && (
         <>
@@ -374,7 +359,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
                     return (
                       <tr key={player.id}>
                         <td>
-                          {player.name} · #{player.number}
+                          <span className="player-identity"><PlayerFace id={player.id} />{player.name} · #{player.number}</span>
                         </td>
                         <td>
                           {result ? Number(result.average).toFixed(2) : "—"}
@@ -394,7 +379,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
                 <span className={`match-action-icon ${ev.kind}`} aria-hidden="true">{eventIcons[ev.kind]}</span>
                 <div>
                   <strong>{eventRules[ev.kind].label}</strong>
-                  <p>{data.players.find((p) => p.id === ev.playerId)?.name}{ev.context ? ` · ${ev.context}` : ""}</p>
+                  <p><span className="player-identity"><PlayerFace id={ev.playerId} />{data.players.find((p) => p.id === ev.playerId)?.name}</span>{ev.context ? ` · ${ev.context}` : ""}</p>
                 </div>
               </div>
             ))}
@@ -404,7 +389,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
           {results.map((r) => (
             <div className="account-request" key={r.playerId}>
               <strong>
-                {data.players.find((p) => p.id === r.playerId)?.name}
+                <span className="player-identity"><PlayerFace id={r.playerId} />{data.players.find((p) => p.id === r.playerId)?.name}</span>
               </strong>
               <span>
                 {Number(r.average).toFixed(2)} · {r.count} valoración

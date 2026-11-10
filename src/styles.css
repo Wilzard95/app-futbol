@@ -209,6 +209,21 @@ select {
 .header-account:has(.header-profile-photo) { grid-template-columns: 28px minmax(0,1fr); align-items: center; column-gap: 8px; }
 .roster-player { display: inline-flex; align-items: center; gap: 8px; }
 .roster-portrait { width: 30px; height: 30px; object-fit: cover; border-radius: 50%; }
+.player-identity { display: inline-flex; align-items: center; gap: 8px; }
+.player-face { display: inline-flex; width: 36px; height: 36px; flex: 0 0 36px; overflow: hidden; border-radius: 50%; background: #e7f2dd; vertical-align: middle; }
+.player-face svg { width: 100%; height: 100%; display: block; }
+.player-face.header-profile-photo { width: 28px; height: 28px; min-width: 28px; }
+.player-picker { margin: 0; padding: 0; border: 0; min-width: 0; }
+.player-picker legend { font-size: 13px; font-weight: 700; color: #405847; margin-bottom: 9px; }
+.player-picker-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 7px; max-height: 260px; overflow-y: auto; padding: 2px; }
+.account-form .player-choice, .player-choice { min-height: 52px; display: flex; align-items: center; gap: 8px; text-align: left; padding: 7px; color: #264731; background: #fff; border: 1px solid #dbe5d5; border-radius: 10px; font-size: 12px; }
+.player-choice span:not(.player-face) { min-width: 0; overflow-wrap: anywhere; }
+.player-choice small { display: block; font-size: 10px; font-weight: 500; color: #6b806b; }
+.account-form .player-choice[aria-pressed="true"], .player-choice[aria-pressed="true"] { background: #e3f2d8; border-color: #5a8a48; box-shadow: 0 0 0 1px #5a8a48; }
+.player-choice:disabled { opacity: .5; cursor: not-allowed; }
+.overview-crest { width: 56px; height: 56px; display: grid; place-items: center; flex: 0 0 56px; border-radius: 14px; color: #537b54; background: #edf4e8; }
+.overview-crest img { width: 100%; height: 100%; object-fit: contain; border-radius: 14px; }
+.connected-panel > .section-heading:has(.overview-crest) { justify-content: flex-start; }
 @media (max-width: 480px) { .profile-visual-grid { grid-template-columns: 1fr; } }
 .team-card strong {
   font-size: 12px;
@@ -1385,7 +1400,7 @@ h1 { font-size: clamp(28px, 3vw, 42px); line-height: 1.1; }
 .connected-panel h3 { color: #193f2c; font-size: 17px; margin: 26px 0 12px; }
 .connected-panel p { line-height: 1.65; }
 .connected-panel > .account-form, .roster-form { background: #f6f9f2; border: 1px solid #e3ebdc; border-radius: 14px; padding: 18px; margin: 16px 0; }
-.connected-panel > .match-rating-pickers { max-width: none; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
+.connected-panel > .match-rating-pickers { max-width: none; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
 .match-rating-pickers select:disabled { opacity: .6; cursor: not-allowed; }
 .reaction-picker { border: 0; padding: 0; margin: 0; min-width: 0; }
 .reaction-picker legend { font-size: 13px; font-weight: 700; color: #405847; margin-bottom: 8px; }

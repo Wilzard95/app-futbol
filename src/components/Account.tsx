@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
 import { appBaseUrl } from "../domain/app-url";
 import ProfileVisualEditor from "./ProfileVisualEditor";
+import { PlayerFace, PlayerPicker } from "./PlayerIdentity";
 
 type Player = {
   id: string;
@@ -250,7 +251,7 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
             <p>
               Tu ficha:{" "}
               <strong>
-                {context.players.find((p) => p.id === context.playerId)?.name}
+                <span className="player-identity"><PlayerFace id={context.playerId} />{context.players.find((p) => p.id === context.playerId)?.name}</span>
               </strong>
             </p>
           )}
@@ -265,21 +266,7 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
           )}
           {context.canClaim && !context.playerId && (
             <div className="account-form">
-              <label>
-                Esta es mi ficha
-                <select
-                  value={selected}
-                  onChange={(e) => setSelected(e.target.value)}
-                >
-                  <option value="">Selecciona un jugador</option>
-                  {context.players.map((p) => (
-                    <option key={p.id} value={p.id} disabled={p.occupied}>
-                      {p.name} · #{p.number}
-                      {p.occupied ? " · ocupada" : ""}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <PlayerPicker label="Esta es mi ficha" players={context.players} value={selected} onChange={setSelected} />
               <button
                 disabled={busy || !selected}
                 onClick={() =>
@@ -335,7 +322,7 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
               {context.claims.map((c) => (
                 <div key={c.userId} className="account-request">
                   <span>
-                    {c.email} solicita {c.name}
+                    <span className="player-identity"><PlayerFace id={c.playerId} />{c.email} solicita {c.name}</span>
                   </span>
                   <button
                     disabled={busy}
@@ -377,7 +364,7 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
                 .map((p) => (
                   <div className="account-request" key={p.id}>
                     <span>
-                      {p.name} ·{" "}
+                      <PlayerFace id={p.id} /> {p.name} ·{" "}
                       {
                         context.linkedAccounts.find(
                           (entry) => entry.playerId === p.id,

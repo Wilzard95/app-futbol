@@ -34,6 +34,7 @@ import AccountHeader from "./components/AccountHeader";
 import TeamSelector from "./components/TeamSelector";
 import type { Team } from "./components/TeamSelector";
 import { setActiveTeam } from "./supabase";
+import { TeamVisualProvider } from "./components/PlayerIdentity";
 import LineupLab, { LineupOverview } from "./components/LineupLab";
 import { tournamentAverage } from "./domain/rules";
 import type { MatchEvent, Player } from "./domain/types";
@@ -260,7 +261,7 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
+    <TeamVisualProvider teamId={team?.id ?? ""}><div className="app-shell">
       <aside className="sidebar">
         <a
           className="brand"
@@ -311,7 +312,7 @@ export default function App() {
           <div className="breadcrumb">
             {team?.name ?? "Mi equipo"} <span>/</span> <strong>{activeNav.label}</strong>
           </div>
-          <AccountHeader key={`header-${team?.id}`} teamId={team?.id ?? ""} onOpen={() => setView("account")} />
+          <AccountHeader key={`header-${team?.id}`} onOpen={() => setView("account")} />
         </header>
         <main id="main">
           <div className="page-heading">
@@ -350,7 +351,6 @@ export default function App() {
             <>
               <RealOverview
                 key={`overview-${team?.id}`}
-                teamId={team?.id ?? ""}
                 mode="overview"
                 onAccount={() => setView("account")}
               />
@@ -514,7 +514,6 @@ export default function App() {
             <>
               <RealOverview
                 key={`players-${team?.id}`}
-                teamId={team?.id ?? ""}
                 mode="players"
                 onAccount={() => setView("account")}
               />
@@ -599,7 +598,7 @@ export default function App() {
           )}
           {view === "lineup" && (
             <>
-              <RealLineups key={`lineup-${team?.id}`} teamId={team?.id ?? ""} onAccount={() => setView("account")} />
+              <RealLineups key={`lineup-${team?.id}`} onAccount={() => setView("account")} />
               {import.meta.env.DEV && (
                 <details>
                   <summary>Simulación de titulares (datos de prueba)</summary>
@@ -625,6 +624,6 @@ export default function App() {
           </footer>
         </main>
       </div>
-    </div>
+    </div></TeamVisualProvider>
   );
 }
