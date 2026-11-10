@@ -59,7 +59,7 @@ export default function LineupPitch({
                         </span>
                         <AvatarFigure avatar={player.avatar ?? defaultAvatar} photo={player.photo} className="pitch-avatar" />
                         <span className="pitch-name">
-                          {player.name.split(" ")[0]}
+                          {player.name.split(" ")[0]}{player.retired ? " · retirado" : ""}
                         </span>
                       </span>
                     );

@@ -201,6 +201,18 @@ test("no saved proposals means no winning formation and no invented players", ()
   );
 });
 
+test("historical proposals stay visible while removed players do not win current positions", () => {
+  const first = proposal("a", "p1");
+  const second = proposal("b", "p2");
+  const removed = first.picks[selected.slots[1].id];
+  const active = roster.filter(id => id !== removed);
+  const voting = formationVoting("t1", 6, [first, second], roster, voters);
+  const result = lineupConsensus("t1", selected, [first, second], roster, voters, active);
+  assert.equal(voting.total, 2);
+  assert.equal(result.proposalCount, 2);
+  assert.ok(result.positions.every(position => !position.winners.includes(removed)));
+});
+
 test("anonymous proposals omit author identity and do not share mutable picks", () => {
   const original = proposal("a", "p1");
   const result = anonymousLineups("t1", [

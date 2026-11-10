@@ -20,6 +20,7 @@ export interface Player {
   linked: boolean;
   avatar?: import("./visuals").AvatarStyle | null;
   photo?: string | null;
+  retired?: boolean;
 }
 
 export interface Tournament {

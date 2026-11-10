@@ -207,6 +207,7 @@ export function lineupConsensus(
   proposals: LineupProposal[],
   rosterIds: string[],
   eligibleVoterIds?: string[],
+  eligiblePlayerIds?: string[],
 ) {
   const sameFormation = tournamentProposals(
     tournamentId,
@@ -219,6 +220,7 @@ export function lineupConsensus(
     const counts = new Map<string, number>();
     for (const proposal of sameFormation) {
       const id = proposal.picks[slot.id];
+      if (eligiblePlayerIds && !eligiblePlayerIds.includes(id)) continue;
       counts.set(id, (counts.get(id) ?? 0) + 1);
     }
     const votes = Math.max(0, ...counts.values());

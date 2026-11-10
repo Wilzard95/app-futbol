@@ -150,13 +150,16 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
         </button>
       </section>
     );
+  if (data.tournaments.length === 0)
+    return <section className="panel connected-panel"><h2>Titular colectiva</h2><p>Aún no hay torneos en este equipo.</p></section>;
   if (!tour || !all || !formationId)
     return (
       <section className="panel connected-panel">
         {message || "Cargando torneos…"}
       </section>
     );
-  const players: Player[] = data.players.filter((p) => (data.roster[tid] ?? []).includes(p.id)).map((p) => ({ ...p, linked: true, avatar: visuals?.players[p.id]?.avatar ?? null, photo: visuals?.players[p.id]?.photo ?? null }));
+  const allPlayers: Player[] = data.players.map((p) => ({ ...p, linked: true, avatar: visuals?.players[p.id]?.avatar ?? null, photo: visuals?.players[p.id]?.photo ?? null, retired: !(data.roster[tid] ?? []).includes(p.id) }));
+  const players = allPlayers.filter((p) => (data.roster[tid] ?? []).includes(p.id));
   const roster = players.map((p) => p.id);
   const form = getFormation(tour.format, formationId);
   const proposals: LineupProposal[] = all.proposals.map((p) => ({
@@ -164,12 +167,13 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
     tournamentId: tid,
     authorPlayerId: p.id,
   }));
-  const voting = formationVoting(tid, tour.format, proposals, roster);
+  const historicalRoster = allPlayers.map((p) => p.id);
+  const voting = formationVoting(tid, tour.format, proposals, historicalRoster);
   const collectiveForm = getFormation(
     tour.format,
     viewFormation || voting.leaders[0] || formationId,
   );
-  const consensus = lineupConsensus(tid, collectiveForm, proposals, roster);
+  const consensus = lineupConsensus(tid, collectiveForm, proposals, historicalRoster, undefined, roster);
   const positions = form.slots.map((s) => ({
     ...s,
     winners: picks[s.id] ? [picks[s.id]] : [],
@@ -251,7 +255,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
       <LineupPitch
         formation={collectiveForm}
         positions={consensus.positions}
-        players={players}
+        players={allPlayers}
         averages={all.averages}
         caption="Titular colectiva"
         showVotes
@@ -269,6 +273,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
       {data.myPlayer && roster.includes(data.myPlayer) ? (
         <>
           <h3>Mi titular</h3>
+          {Object.values(picks).some(id => id && !roster.includes(id)) && <p>Tu propuesta anterior incluye jugadores retirados; sustitúyelos para volver a guardarla.</p>}
           <div className="account-form">
             <label>
               Mi formación
@@ -292,7 +297,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
           <LineupPitch
             formation={form}
             positions={positions}
-            players={players}
+            players={allPlayers}
             averages={all.averages}
             caption="Tu propuesta"
             selectedPositionId={slot}
@@ -306,7 +311,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
             >
               Completar con la plantilla
             </button>
-            <button disabled={busy || !form.slots.every((position) => !!picks[position.id]) || new Set(Object.values(picks).filter(Boolean)).size !== form.slots.length} onClick={() => void save()}>
+            <button disabled={busy || !form.slots.every((position) => !!picks[position.id] && roster.includes(picks[position.id])) || new Set(Object.values(picks).filter(Boolean)).size !== form.slots.length} onClick={() => void save()}>
               Guardar mi titular
             </button>
           </div>
@@ -330,7 +335,7 @@ export default function RealLineups({ onAccount }: { onAccount: () => void }) {
                 winners: p.picks[s.id] ? [p.picks[s.id]] : [],
                 votes: 0,
               }))}
-              players={players}
+              players={allPlayers}
               averages={all.averages}
               caption="Propuesta anónima"
             />

@@ -243,6 +243,9 @@ select {
 .delete-team-panel input { width: 100%; max-width: 360px; min-height: 42px; padding: 10px; border: 1px solid #dfc3be; border-radius: 8px; font: inherit; }
 .delete-team-button { padding: 11px 14px; border-radius: 8px; color: white; background: #a63830; font-weight: 700; }
 .delete-team-button:disabled { opacity: .45; cursor: not-allowed; }
+.tournament-entry .account-request { margin-bottom: 8px; }
+.account-request .tournament-delete-toggle { margin-left: auto; color: #963b34; background: #fbecea; }
+.tournament-delete-panel { margin: 0 0 14px; padding: 14px; }
 .connected-panel > .section-heading:has(.overview-crest) { justify-content: flex-start; }
 @media (max-width: 480px) { .profile-visual-grid { grid-template-columns: 1fr; } }
 .team-card strong {

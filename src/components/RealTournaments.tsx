@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "../supabase";
+import { rawSupabase, supabase } from "../supabase";
 import type { Team } from "./TeamSelector";
 
 type Tournament = { id: string; name: string; format: number };
@@ -15,6 +15,8 @@ export default function RealTournaments({ onAccount, team, teams, onSelectTeam }
   const [format, setFormat] = useState("6");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState("");
   useEffect(() => {
     let active = true;
     client.auth.getSession().then(({ data: auth }) => { if (active) { setSession(auth.session); setLoading(false); } });
@@ -43,6 +45,20 @@ export default function RealTournaments({ onAccount, team, teams, onSelectTeam }
     } catch { setMessage("No se pudo conectar. Inténtalo de nuevo."); }
     finally { setBusy(false); }
   }
+  async function deleteTournament(tournament: Tournament) {
+    if (!team || confirmation !== tournament.name) return;
+    if (!window.confirm(`¿Eliminar definitivamente «${tournament.name}»? Se eliminarán sus partidos, acciones, valoraciones y titulares. Los jugadores permanecerán en el equipo.`)) return;
+    setBusy(true); setMessage("");
+    try {
+      const result = await rawSupabase!.rpc("multi_delete_tournament", { team: team.id, tournament: tournament.id, confirmation });
+      if (result.error) { setMessage(result.error.message); return; }
+      setDeleting(null); setConfirmation("");
+      const refreshed = await client.rpc("sports_data");
+      if (refreshed.error) setMessage("Torneo eliminado. Recarga para actualizar la lista.");
+      else { setData(refreshed.data as SportsData); setMessage("Torneo eliminado. Los jugadores permanecen en el equipo."); }
+    } catch { setMessage("No se pudo conectar. Comprueba el torneo antes de intentarlo de nuevo."); }
+    finally { setBusy(false); }
+  }
   if (loading) return <section className="panel connected-panel">Cargando…</section>;
   if (!session) return <section className="panel connected-panel"><h2>Mis torneos</h2><p>Inicia sesión para consultar tus torneos.</p><button className="lab-primary-button" onClick={onAccount}>Ir a Mi cuenta</button></section>;
   if (!data) return <section className="panel connected-panel"><h2>Mis torneos</h2><p>{message || "Cargando torneos…"}</p><button className="text-button" onClick={onAccount}>Ir a Mi cuenta</button></section>;
@@ -59,6 +75,8 @@ export default function RealTournaments({ onAccount, team, teams, onSelectTeam }
     <p role="status">{message}</p>
     <h3>Torneos del equipo</h3>
     {data.tournaments.length === 0 && <p>Aún no hay torneos.</p>}
-    {data.tournaments.map(t => <div className="account-request" key={t.id}><strong>{t.name}</strong><span>Fútbol {t.format}</span></div>)}
+    {data.tournaments.map(t => <div className="tournament-entry" key={t.id}><div className="account-request"><strong>{t.name}</strong><span>Fútbol {t.format}</span>{data.role === "admin" && <button type="button" className="tournament-delete-toggle" aria-expanded={deleting === t.id} onClick={() => { setDeleting(deleting === t.id ? null : t.id); setConfirmation(""); }}>Eliminar torneo</button>}</div>
+      {deleting === t.id && <div className="delete-team-panel tournament-delete-panel"><div className="delete-team-warning"><strong>Esta acción es permanente.</strong><p>Se eliminarán los partidos, acciones, valoraciones, comentarios y titulares de este torneo. Los jugadores y sus cuentas seguirán en el equipo; los demás torneos no se modificarán.</p></div><label>Escribe <strong>{t.name}</strong> para confirmar<input value={confirmation} onChange={e => setConfirmation(e.target.value)} autoComplete="off" /></label><button type="button" className="delete-team-button" disabled={busy || confirmation !== t.name} onClick={() => void deleteTournament(t)}>Eliminar torneo definitivamente</button></div>}
+    </div>)}
   </section>;
 }

@@ -24,10 +24,12 @@ export default function RealOverview({
   onAccount,
   mode,
   teamName,
+  teamId,
 }: {
   onAccount: () => void;
   mode: "overview" | "players";
   teamName: string;
+  teamId: string;
 }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -126,7 +128,8 @@ export default function RealOverview({
       </section>
     );
   const games = data.matches.filter((g) => g.tournamentId === tid);
-  const players = data.players.filter((p) => (data.roster[tid] ?? []).includes(p.id)).sort(
+  const activeRoster = data.roster[tid] ?? [];
+  const players = data.players.filter((p) => activeRoster.includes(p.id) || (mode === "overview" && games.some(g => g.participants.includes(p.id)))).sort(
     (a, b) =>
       (averages[b.id] ?? -1) - (averages[a.id] ?? -1) ||
       a.name.localeCompare(b.name),
@@ -158,7 +161,7 @@ export default function RealOverview({
         </label>
       </div>
       {mode === "players" && data.role === "admin" && tid && (
-        <TournamentRosterAdmin tournament={tid} players={data.players} enrolled={data.roster[tid] ?? []} onRefresh={async () => {
+        <TournamentRosterAdmin key={tid} tournament={tid} teamId={teamId} players={data.players} enrolled={data.roster[tid] ?? []} onRefresh={async () => {
           const result = await client.rpc("sports_data");
           if (result.error) throw result.error;
           setData(result.data as Data);
@@ -197,7 +200,7 @@ export default function RealOverview({
               const stats = tournamentPlayerStats(p.id, games);
               return (
               <tr key={p.id}>
-                <td><span className="roster-player"><PlayerFace id={p.id} /><span>{p.name} · #{p.number} · {p.position}</span></span></td>
+                <td><span className="roster-player"><PlayerFace id={p.id} /><span>{p.name} · #{p.number} · {p.position}{!activeRoster.includes(p.id) ? " · retirado" : ""}</span></span></td>
                 <td>
                   {stats.matches}
                 </td>
