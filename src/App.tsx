@@ -42,8 +42,8 @@ import type { MatchEvent, Player } from "./domain/types";
 type View = "overview" | "players" | "matches" | "lineup" | "account" | "tournaments";
 const navigation: { id: View; label: string; icon: LucideIcon }[] = [
   { id: "overview", label: "Resumen", icon: LayoutDashboard },
-  { id: "players", label: "Plantilla", icon: Users },
   { id: "tournaments", label: "Mis torneos", icon: Trophy },
+  { id: "players", label: "Plantilla", icon: Users },
   { id: "matches", label: "Partidos", icon: CalendarDays },
   { id: "lineup", label: "Titular colectiva", icon: ClipboardList },
   { id: "account", label: "Mi cuenta", icon: LockKeyhole },
