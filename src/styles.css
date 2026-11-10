@@ -1347,6 +1347,13 @@ h1 { font-size: clamp(28px, 3vw, 42px); line-height: 1.1; }
 .connected-panel > .account-form, .roster-form { background: #f6f9f2; border: 1px solid #e3ebdc; border-radius: 14px; padding: 18px; margin: 16px 0; }
 .connected-panel > .match-rating-pickers { max-width: none; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
 .match-rating-pickers select:disabled { opacity: .6; cursor: not-allowed; }
+.reaction-picker { border: 0; padding: 0; margin: 0; min-width: 0; }
+.reaction-picker legend { font-size: 13px; font-weight: 700; color: #405847; margin-bottom: 8px; }
+.reaction-options { display: flex; flex-wrap: wrap; gap: 10px; }
+.account-form .reaction-button { background: #fff; color: #405847; border: 1px solid #dbe5d5; display: flex; align-items: center; gap: 8px; font-size: 21px; }
+.account-form .reaction-button span { font-size: 13px; }
+.account-form .reaction-button[aria-pressed="true"] { background: #e4f3d3; border-color: #679351; box-shadow: 0 0 0 2px #a7c78f; color: #143d2b; }
+.reaction-picker small { display: block; margin-top: 7px; color: #647969; }
 .match-action { display: flex; align-items: center; gap: 12px; padding: 11px 13px; margin: 8px 0; border: 1px solid #e1eadc; border-radius: 11px; background: #fafcf8; }
 .match-action-icon { display: grid; place-items: center; flex: 0 0 38px; height: 38px; border-radius: 10px; background: #eaf2e4; font-size: 20px; }
 .match-action-icon.yellow_card { background: #fff5d5; }

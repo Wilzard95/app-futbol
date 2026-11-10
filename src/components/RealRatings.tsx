@@ -281,6 +281,72 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
             {data.tournaments.find((t) => t.id === game.tournamentId)?.name} ·{" "}
             {game.participants.length} participantes
           </p>
+          {canRate && target ? (
+            <form className="account-form" onSubmit={submit}>
+              {target && (
+                <>
+                  <label>
+                    Nota general (1 a 10)
+                    <input
+                      required
+                      type="number"
+                      min="1"
+                      max="10"
+                      step="0.1"
+                      value={score}
+                      onChange={(e) => setScore(e.target.value)}
+                    />
+                  </label>
+                  {targetEvents.map((ev) => (
+                    <label key={ev.id}>
+                      <span><span aria-hidden="true">{eventIcons[ev.kind]} </span>{eventRules[ev.kind].label}</span>
+                      {ev.context && ` · ${ev.context}`}{" "}
+                      <strong>{(adjustments[ev.id] ?? 0).toFixed(1)}</strong>
+                      <input
+                        type="range"
+                        min={eventRules[ev.kind].min}
+                        max={eventRules[ev.kind].max}
+                        step="0.1"
+                        value={adjustments[ev.id] ?? 0}
+                        onChange={(e) =>
+                          setAdjustments({
+                            ...adjustments,
+                            [ev.id]: Number(e.target.value),
+                          })
+                        }
+                      />
+                    </label>
+                  ))}
+                  <label>
+                    Comentario anónimo (opcional)
+                    <textarea
+                      maxLength={500}
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                    />
+                  </label>
+                  <fieldset className="reaction-picker">
+                    <legend>Reacción (opcional)</legend>
+                    <div className="reaction-options">
+                      <button type="button" className="reaction-button" aria-label="Aprobación" aria-pressed={reaction === "approve"} onClick={() => setReaction(reaction === "approve" ? "" : "approve")}>👍 <span>Aprobación</span></button>
+                      <button type="button" className="reaction-button" aria-label="Desaprobación" aria-pressed={reaction === "disapprove"} onClick={() => setReaction(reaction === "disapprove" ? "" : "disapprove")}>👎 <span>Desaprobación</span></button>
+                    </div>
+                    <small>Pulsa de nuevo para quitar tu reacción.</small>
+                  </fieldset>
+                  <button disabled={busy || !score}>Guardar valoración</button>
+                </>
+              )}
+            </form>
+          ) : !canRate ? (
+            <p>
+              {!game.open
+                ? "El administrador todavía no ha abierto las valoraciones."
+                : game.closed
+                  ? "La valoración de este partido está cerrada."
+                  : "Tu ficha no participó en este partido."}
+            </p>
+          ) : <p>Selecciona un jugador arriba para valorar su partido.</p>}
+          <p role="status">{message}</p>
           <h3>Promedios de este partido</h3>
           <div className="table-scroll">
             <table className="player-table">
@@ -333,75 +399,6 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
               </div>
             ))}
           </details>
-          {canRate && target ? (
-            <form className="account-form" onSubmit={submit}>
-              {target && (
-                <>
-                  <label>
-                    Nota general (1 a 10)
-                    <input
-                      required
-                      type="number"
-                      min="1"
-                      max="10"
-                      step="0.1"
-                      value={score}
-                      onChange={(e) => setScore(e.target.value)}
-                    />
-                  </label>
-                  {targetEvents.map((ev) => (
-                    <label key={ev.id}>
-                      <span><span aria-hidden="true">{eventIcons[ev.kind]} </span>{eventRules[ev.kind].label}</span>
-                      {ev.context && ` · ${ev.context}`}{" "}
-                      <strong>{(adjustments[ev.id] ?? 0).toFixed(1)}</strong>
-                      <input
-                        type="range"
-                        min={eventRules[ev.kind].min}
-                        max={eventRules[ev.kind].max}
-                        step="0.1"
-                        value={adjustments[ev.id] ?? 0}
-                        onChange={(e) =>
-                          setAdjustments({
-                            ...adjustments,
-                            [ev.id]: Number(e.target.value),
-                          })
-                        }
-                      />
-                    </label>
-                  ))}
-                  <label>
-                    Comentario anónimo (opcional)
-                    <textarea
-                      maxLength={500}
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Reacción
-                    <select
-                      value={reaction}
-                      onChange={(e) => setReaction(e.target.value)}
-                    >
-                      <option value="">Sin reacción</option>
-                      <option value="approve">👍 Aprobación</option>
-                      <option value="disapprove">👎 Desaprobación</option>
-                    </select>
-                  </label>
-                  <button disabled={busy || !score}>Guardar valoración</button>
-                </>
-              )}
-            </form>
-          ) : !canRate ? (
-            <p>
-              {!game.open
-                ? "El administrador todavía no ha abierto las valoraciones."
-                : game.closed
-                  ? "La valoración de este partido está cerrada."
-                  : "Tu ficha no participó en este partido."}
-            </p>
-          ) : <p>Selecciona un jugador arriba para valorar su partido.</p>}
-          <p role="status">{message}</p>
           <h3>Resultados del partido</h3>
           {results.length === 0 && <p>Todavía no hay valoraciones.</p>}
           {results.map((r) => (
