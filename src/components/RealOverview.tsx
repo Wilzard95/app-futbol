@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
 import TournamentRosterAdmin from "./TournamentRosterAdmin";
+import { tournamentPlayerStats } from "../domain/player-stats";
+import type { MatchEventKind } from "../domain/types";
 type Player = { id: string; name: string; number: string; position: string };
 type Tournament = { id: string; name: string; format: number };
 type Game = {
@@ -12,6 +14,7 @@ type Game = {
   goalsFor: number;
   goalsAgainst: number;
   participants: string[];
+  events: { playerId: string; kind: MatchEventKind }[];
 };
 type Data = { role: string; players: Player[]; tournaments: Tournament[]; matches: Game[]; roster: Record<string, string[]> };
 const client = supabase!;
@@ -179,30 +182,35 @@ export default function RealOverview({
             <tr>
               <th>Jugador</th>
               <th>Partidos</th>
+              {mode === "overview" && <><th>Goles</th><th>Goles / partido</th><th>Asistencias</th><th>Tarjetas (🟨 / 🟥)</th></>}
               <th>Promedio</th>
             </tr>
           </thead>
           <tbody>
-            {players.map((p) => (
+            {players.map((p) => {
+              const stats = tournamentPlayerStats(p.id, games);
+              return (
               <tr key={p.id}>
                 <td>
                   {p.name} · #{p.number} · {p.position}
                 </td>
                 <td>
-                  {games.filter((g) => g.participants.includes(p.id)).length}
+                  {stats.matches}
                 </td>
+                {mode === "overview" && <><td>{stats.goals}</td><td>{stats.goalsPerMatch === null ? "—" : stats.goalsPerMatch.toFixed(2)}</td><td>{stats.assists}</td><td>{stats.yellowCards + stats.redCards} ({stats.yellowCards} / {stats.redCards})</td></>}
                 <td>
                   {averages[p.id] == null
                     ? "—"
                     : Number(averages[p.id]).toFixed(1)}
                 </td>
               </tr>
-            ))}
+            ); })}
           </tbody>
         </table>
       </div>
       <p className="panel-footnote">
         Cada partido valorado aporta el mismo peso al promedio del torneo.
+        {mode === "overview" && " Los goles por partido se calculan dividiendo los goles entre los partidos jugados en este torneo."}
       </p>
     </section>
   );
