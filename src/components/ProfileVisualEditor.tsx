@@ -44,7 +44,8 @@ export default function ProfileVisualEditor({ team, player }: { team: string; pl
         <label className="visual-upload">Elegir foto<input type="file" accept="image/jpeg,image/png,image/webp" disabled={!ready} onChange={e => void upload(e.target.files?.[0])} /></label>
         {photo && <button type="button" className="text-button" onClick={() => setPhoto(null)}>Quitar foto</button>}
       </div>
-      <div><h3>Mi avatar</h3><AvatarFigure avatar={avatar} className="profile-avatar-preview" />
+      <div><h3>Mi avatar</h3><AvatarFigure avatar={avatar} photo={photo} className="profile-avatar-preview" />
+        {photo && <p>Tu foto aparecerá en la cara del avatar.</p>}
         {(["skin", "hair", "shirt"] as const).map(key => <label className="avatar-option" key={key}>{key === "skin" ? "Piel" : key === "hair" ? "Cabello" : "Camiseta"}<select value={avatar[key]} onChange={e => setAvatar({ ...avatar, [key]: e.target.value })}>{choices[key].map((color, index) => <option key={color} value={color}>Color {index + 1}</option>)}</select></label>)}
         <label className="avatar-option">Peinado<select value={avatar.style} onChange={e => setAvatar({ ...avatar, style: e.target.value as AvatarStyle["style"] })}><option value="short">Corto</option><option value="long">Largo</option><option value="none">Sin cabello</option></select></label>
       </div>

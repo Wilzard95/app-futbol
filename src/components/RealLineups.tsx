@@ -162,7 +162,7 @@ export default function RealLineups({ onAccount, teamId }: { onAccount: () => vo
         {message || "Cargando torneos…"}
       </section>
     );
-  const players: Player[] = data.players.filter((p) => (data.roster[tid] ?? []).includes(p.id)).map((p) => ({ ...p, linked: true, avatar: visuals?.players[p.id]?.avatar ?? null }));
+  const players: Player[] = data.players.filter((p) => (data.roster[tid] ?? []).includes(p.id)).map((p) => ({ ...p, linked: true, avatar: visuals?.players[p.id]?.avatar ?? null, photo: visuals?.players[p.id]?.photo ?? null }));
   const roster = players.map((p) => p.id);
   const form = getFormation(tour.format, formationId);
   const proposals: LineupProposal[] = all.proposals.map((p) => ({
