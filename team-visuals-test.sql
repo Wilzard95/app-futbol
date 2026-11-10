@@ -14,9 +14,10 @@ insert into app_private.multi_membership(team_id,user_id,role,player_id) values(
 set local role authenticated;
 select set_config('request.jwt.claim.sub','bbbbbbbb-aaaa-4aaa-8aaa-aaaaaaaaaaa2',true);
 select public.multi_set_profile_visuals(current_setting('test.visual_team'),'data:image/jpeg;base64,YQ==','{"skin":"#d99568","hair":"#241811","shirt":"#17623e","style":"short"}');
+select public.multi_set_profile_visuals(current_setting('test.visual_team'),'data:image/jpeg;base64,YQ==','{"skin":"#d99568","hair":"#241811","shirt":"#ef7a27","style":"curly","usePhoto":false,"photoX":0.5,"photoY":-0.5}');
 do $$ declare d jsonb; begin
  d:=public.multi_visuals(current_setting('test.visual_team'));
- if d->>'crest'<>'data:image/jpeg;base64,YQ==' or d->'players'->current_setting('test.visual_player')->'avatar'->>'style'<>'short' then raise exception 'Visuals not saved'; end if;
+ if d->>'crest'<>'data:image/jpeg;base64,YQ==' or d->'players'->current_setting('test.visual_player')->'avatar'->>'style'<>'curly' or (d->'players'->current_setting('test.visual_player')->'avatar'->>'usePhoto')::boolean then raise exception 'Visuals not saved'; end if;
  begin perform public.multi_set_crest(current_setting('test.visual_team'),null); raise exception 'Non-admin changed crest'; exception when raise_exception then if sqlerrm<>'Sin permiso para administrar este equipo' then raise; end if; end;
  begin perform public.multi_set_profile_visuals(current_setting('test.visual_team'),null,'{"skin":null,"hair":"#241811","shirt":"#17623e","style":"short"}'); raise exception 'Invalid avatar accepted'; exception when raise_exception then if sqlerrm<>'Avatar inválido' then raise; end if; end;
 end $$;

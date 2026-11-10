@@ -1,5 +1,6 @@
-export type AvatarStyle = { skin: string; hair: string; shirt: string; style: "short" | "long" | "none" };
-export const defaultAvatar: AvatarStyle = { skin: "#d99568", hair: "#241811", shirt: "#17623e", style: "short" };
+export type AvatarStyle = { skin: string; hair: string; shirt: string; style: "short" | "long" | "none" | "curly" | "spiky" | "side"; usePhoto?: boolean; photoX?: number; photoY?: number };
+export const defaultAvatar: AvatarStyle = { skin: "#d99568", hair: "#241811", shirt: "#17623e", style: "short", usePhoto: true, photoX: 0, photoY: 0 };
+export const clampPhotoPosition = (value: unknown) => typeof value === "number" && Number.isFinite(value) ? Math.max(-1, Math.min(1, value)) : 0;
 export type Visuals = { crest: string | null; players: Record<string, { photo: string | null; avatar: AvatarStyle | null }> };
 
 export async function prepareImage(file: File): Promise<string> {
