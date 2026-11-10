@@ -351,6 +351,7 @@ export default function App() {
             <>
               <RealOverview
                 key={`overview-${team?.id}`}
+                teamName={team?.name ?? "tu equipo"}
                 mode="overview"
                 onAccount={() => setView("account")}
               />
@@ -514,6 +515,7 @@ export default function App() {
             <>
               <RealOverview
                 key={`players-${team?.id}`}
+                teamName={team?.name ?? "tu equipo"}
                 mode="players"
                 onAccount={() => setView("account")}
               />

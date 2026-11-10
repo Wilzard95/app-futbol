@@ -23,9 +23,11 @@ const client = supabase!;
 export default function RealOverview({
   onAccount,
   mode,
+  teamName,
 }: {
   onAccount: () => void;
   mode: "overview" | "players";
+  teamName: string;
 }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -135,7 +137,7 @@ export default function RealOverview({
         {mode === "overview" && <span className="overview-crest">{visuals?.crest ? <img src={visuals.crest} alt="Escudo del equipo" /> : <Shield size={28} aria-label="Equipo sin escudo" />}</span>}
         <div>
           <h2>
-            {mode === "players" ? "Plantilla del equipo" : "Resumen del equipo"}{" "}
+            {mode === "players" ? "Plantilla del equipo" : `Resumen de ${teamName}`}{" "}
             <span>DATOS REALES</span>
           </h2>
           <p>

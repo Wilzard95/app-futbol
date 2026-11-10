@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { supabase } from "../supabase";
+import { rawSupabase, supabase } from "../supabase";
 import { appBaseUrl } from "../domain/app-url";
 import ProfileVisualEditor from "./ProfileVisualEditor";
 import { PlayerFace, PlayerPicker } from "./PlayerIdentity";
@@ -13,6 +13,7 @@ type Player = {
   occupied: boolean;
 };
 type Claim = { userId: string; playerId: string; email: string; name: string };
+type TeamRoleEntry = { userId: string; playerId: string | null; name: string | null; number: string | null; email: string; role: "admin" | "player"; owner: boolean };
 type Context = {
   role: string | null;
   playerId: string | null;
@@ -47,6 +48,7 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState("");
+  const [teamRoles, setTeamRoles] = useState<TeamRoleEntry[] | null>(null);
   const [recovery, setRecovery] = useState(() =>
     new URLSearchParams(location.search).has("recovery"),
   );
@@ -81,6 +83,22 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
     setContext(null);
     if (session && hasTeam) void refresh();
   }, [session?.user.id, hasTeam]);
+  useEffect(() => {
+    let active = true; setTeamRoles(null);
+    if (context?.role === "admin" && teamId) void rawSupabase!.rpc("multi_team_roles", { team: teamId }).then(({ data, error }) => { if (active && !error) setTeamRoles(data as TeamRoleEntry[]); });
+    return () => { active = false; };
+  }, [context, teamId, session?.user.id]);
+  async function setAdministrator(member: TeamRoleEntry, makeAdmin: boolean) {
+    setBusy(true); setMessage("");
+    try {
+      const { error } = await rawSupabase!.rpc("multi_set_admin", { team: teamId, member_user: member.userId, make_admin: makeAdmin });
+      if (error) { setMessage(error.message); return; }
+      const result = await rawSupabase!.rpc("multi_team_roles", { team: teamId });
+      if (!result.error) setTeamRoles(result.data as TeamRoleEntry[]);
+      setMessage(makeAdmin ? `${member.name ?? "La cuenta"} ahora es administrador del equipo.` : `Se retiró el permiso de administrador de ${member.name ?? "la cuenta"}.`);
+    } catch { setMessage("No se pudo conectar. Inténtalo de nuevo."); }
+    finally { setBusy(false); }
+  }
   async function run(
     fn: () => PromiseLike<{ error: { message: string } | null }>,
     success: string,
@@ -407,6 +425,13 @@ export default function Account({ hasTeam = true, teamId = "" }: { hasTeam?: boo
                     )}
                   </div>
                 ))}
+              {teamRoles && <section className="team-role-section"><h3>Administradores del equipo</h3>
+                <p>Como creador puedes dar o quitar permisos de administración a cuentas vinculadas. Un administrador puede gestionar jugadores, torneos, partidos, acciones e invitaciones.</p>
+                {teamRoles.map(member => <div className="account-request" key={member.userId}>
+                  <span className="player-identity">{member.playerId && <PlayerFace id={member.playerId} />}<span><strong>{member.name ?? member.email}</strong> · {member.owner ? "Creador" : member.role === "admin" ? "Administrador" : "Jugador"}</span></span>
+                  {!member.owner && member.playerId && <button type="button" disabled={busy} onClick={() => void setAdministrator(member, member.role !== "admin")}>{member.role === "admin" ? "Quitar permiso de admin" : "Dar permiso de admin"}</button>}
+                </div>)}
+              </section>}
             </>
           )}
         </>
