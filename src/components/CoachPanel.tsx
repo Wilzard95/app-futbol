@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { rawSupabase } from "../supabase";
+import ProfileVisualEditor from "./ProfileVisualEditor";
 
 type Coach = { id: string; name: string; occupied: boolean; email: string | null };
 type Claim = { userId: string; coachId: string; name: string; email: string };
@@ -37,6 +38,7 @@ export default function CoachPanel({ teamId, invitation, onChanged }: { teamId: 
   return <section className="coach-panel"><h3>Entrenadores</h3>
     <p>Un entrenador tiene permisos de administración y puede tener también una ficha de jugador.</p>
     {data.myCoach && <p>Tu ficha de entrenador: <strong>{data.coaches.find(c => c.id === data.myCoach)?.name}</strong>. Si acabas de recibir la aprobación, recarga la página para actualizar tus permisos.</p>}
+    {data.myCoach && <ProfileVisualEditor team={teamId} player={data.myCoach} coach />}
     {data.pending && <p>Tu solicitud de entrenador está pendiente de aprobación por el creador.</p>}
     {!data.myCoach && !data.pending && available.length > 0 && <div className="account-form">
       <label>Vincularme como entrenador<select value={selected} onChange={e => setSelected(e.target.value)}><option value="">Selecciona una ficha</option>{available.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
