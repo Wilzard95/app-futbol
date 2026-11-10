@@ -48,6 +48,13 @@ type Own = {
   reaction: string | null;
 };
 const client = supabase!;
+const eventIcons: Record<MatchEventKind, string> = {
+  goal: "⚽",
+  assist: "👟",
+  yellow_card: "🟨",
+  red_card: "🟥",
+  clean_sheet: "🧤",
+};
 
 export default function RealRatings({ onAccount }: { onAccount: () => void }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -239,7 +246,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
           onRefresh={refreshSports}
         />
       )}
-      <div className="account-form">
+      <div className="account-form match-rating-pickers">
         <label>
           Partido
           <select value={gameId} onChange={(e) => setGameId(e.target.value)}>
@@ -248,6 +255,23 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
                 {g.playedAt} · vs. {g.opponent} · {g.goalsFor}–{g.goalsAgainst}
               </option>
             ))}
+          </select>
+        </label>
+        <label>
+          Jugador a valorar
+          <select
+            value={target}
+            disabled={!canRate}
+            onChange={(e) => setTarget(e.target.value)}
+          >
+            <option value="">Selecciona un participante</option>
+            {data.players
+              .filter((p) => game?.participants.includes(p.id))
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} · #{p.number}
+                </option>
+              ))}
           </select>
         </label>
       </div>
@@ -300,31 +324,17 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
             <summary>Acciones registradas ({game.events.length})</summary>
             {game.events.length === 0 && <p>No hay acciones registradas.</p>}
             {game.events.map((ev) => (
-              <p key={ev.id}>
-                {data.players.find((p) => p.id === ev.playerId)?.name}:{" "}
-                {eventRules[ev.kind].label}
-                {ev.context ? ` · ${ev.context}` : ""}
-              </p>
+              <div className="match-action" key={ev.id}>
+                <span className={`match-action-icon ${ev.kind}`} aria-hidden="true">{eventIcons[ev.kind]}</span>
+                <div>
+                  <strong>{eventRules[ev.kind].label}</strong>
+                  <p>{data.players.find((p) => p.id === ev.playerId)?.name}{ev.context ? ` · ${ev.context}` : ""}</p>
+                </div>
+              </div>
             ))}
           </details>
-          {canRate ? (
+          {canRate && target ? (
             <form className="account-form" onSubmit={submit}>
-              <label>
-                Jugador a valorar
-                <select
-                  value={target}
-                  onChange={(e) => setTarget(e.target.value)}
-                >
-                  <option value="">Selecciona un participante</option>
-                  {data.players
-                    .filter((p) => game.participants.includes(p.id))
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name} · #{p.number}
-                      </option>
-                    ))}
-                </select>
-              </label>
               {target && (
                 <>
                   <label>
@@ -341,7 +351,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
                   </label>
                   {targetEvents.map((ev) => (
                     <label key={ev.id}>
-                      {eventRules[ev.kind].label}
+                      <span><span aria-hidden="true">{eventIcons[ev.kind]} </span>{eventRules[ev.kind].label}</span>
                       {ev.context && ` · ${ev.context}`}{" "}
                       <strong>{(adjustments[ev.id] ?? 0).toFixed(1)}</strong>
                       <input
@@ -382,7 +392,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
                 </>
               )}
             </form>
-          ) : (
+          ) : !canRate ? (
             <p>
               {!game.open
                 ? "El administrador todavía no ha abierto las valoraciones."
@@ -390,7 +400,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
                   ? "La valoración de este partido está cerrada."
                   : "Tu ficha no participó en este partido."}
             </p>
-          )}
+          ) : <p>Selecciona un jugador arriba para valorar su partido.</p>}
           <p role="status">{message}</p>
           <h3>Resultados del partido</h3>
           {results.length === 0 && <p>Todavía no hay valoraciones.</p>}

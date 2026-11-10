@@ -1345,6 +1345,15 @@ h1 { font-size: clamp(28px, 3vw, 42px); line-height: 1.1; }
 .connected-panel h3 { color: #193f2c; font-size: 17px; margin: 26px 0 12px; }
 .connected-panel p { line-height: 1.65; }
 .connected-panel > .account-form, .roster-form { background: #f6f9f2; border: 1px solid #e3ebdc; border-radius: 14px; padding: 18px; margin: 16px 0; }
+.connected-panel > .match-rating-pickers { max-width: none; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
+.match-rating-pickers select:disabled { opacity: .6; cursor: not-allowed; }
+.match-action { display: flex; align-items: center; gap: 12px; padding: 11px 13px; margin: 8px 0; border: 1px solid #e1eadc; border-radius: 11px; background: #fafcf8; }
+.match-action-icon { display: grid; place-items: center; flex: 0 0 38px; height: 38px; border-radius: 10px; background: #eaf2e4; font-size: 20px; }
+.match-action-icon.yellow_card { background: #fff5d5; }
+.match-action-icon.red_card { background: #fdebea; }
+.match-action strong { color: #214b33; font-size: 14px; }
+.match-action p { color: #617563; font-size: 13px; margin-top: 2px; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .connected-panel > .match-rating-pickers { grid-template-columns: 1fr; } }
 .connected-panel .account-form label { font-size: 13px; color: #405847; }
 .account-form input, .account-form select, .account-form textarea, .account-link { background: #fff; border-radius: 9px; min-height: 44px; color: #1d3528; }
 .account-form button, .account-request button, .account-actions button, .account-link + button { min-height: 44px; border-radius: 9px; font-weight: 700; }
