@@ -3,7 +3,6 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
 import { PlayerFace, useTeamVisuals } from "./PlayerIdentity";
 import { Shield } from "lucide-react";
-import TournamentRosterAdmin from "./TournamentRosterAdmin";
 import TeamPlayerAdmin from "./TeamPlayerAdmin";
 import { tournamentPlayerStats } from "../domain/player-stats";
 import type { MatchEventKind } from "../domain/types";
@@ -173,13 +172,6 @@ export default function RealOverview({
           </select>
         </label>
       </div>
-      {mode === "players" && data.role === "admin" && tid && (
-        <TournamentRosterAdmin key={tid} tournament={tid} teamId={teamId} players={data.players.filter(p => !p.retiredFromTeam)} enrolled={data.roster[tid] ?? []} onRefresh={async () => {
-          const result = await client.rpc("sports_data");
-          if (result.error) throw result.error;
-          setData(result.data as Data);
-        }} />
-      )}
       {mode === "players" && data.role === "admin" && <TeamPlayerAdmin teamId={teamId} players={data.players} onRefresh={async () => {
         const result = await client.rpc("sports_data");
         if (result.error) throw result.error;
