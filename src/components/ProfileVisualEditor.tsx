@@ -14,7 +14,7 @@ const colorNames = {
   hair: ["negro", "castaño oscuro", "castaño claro", "rubio"],
   shirt: ["verde", "azul oscuro", "rojo", "amarillo", "naranja", "morado", "turquesa", "negro", "blanco", "rosa", "verde oliva", "celeste"],
 };
-export default function ProfileVisualEditor({ team, player }: { team: string; player: string }) {
+export default function ProfileVisualEditor({ team, player, coach = false }: { team: string; player: string; coach?: boolean }) {
   const [photo, setPhoto] = useState<string | null>(null);
   const [avatar, setAvatar] = useState<AvatarStyle>(defaultAvatar);
   const [message, setMessage] = useState("");
@@ -23,14 +23,14 @@ export default function ProfileVisualEditor({ team, player }: { team: string; pl
   const drag = useRef<{ x: number; y: number; startX: number; startY: number; width: number } | null>(null);
   useEffect(() => {
     let active = true; setReady(false);
-    void rawSupabase!.rpc("multi_visuals", { team }).then(({ data, error }) => {
+    void rawSupabase!.rpc(coach ? "multi_coach_visuals" : "multi_visuals", { team }).then(({ data, error }) => {
       if (!active) return;
       if (error) { setMessage("No se pudo cargar tu perfil visual."); return; }
-      const current = (data as Visuals).players[player];
+      const current = coach ? (data as { id: string; photo: string | null; avatar: AvatarStyle | null }[]).find(item => item.id === player) : (data as Visuals).players[player];
       setPhoto(current?.photo ?? null); setAvatar(current?.avatar ?? defaultAvatar); setReady(true);
     });
     return () => { active = false; };
-  }, [team, player]);
+  }, [team, player, coach]);
   async function upload(file?: File) {
     if (!file) return;
     try { setPhoto(await prepareImage(file)); setMessage("Foto preparada. Guarda los cambios para aplicarla."); }
@@ -39,12 +39,12 @@ export default function ProfileVisualEditor({ team, player }: { team: string; pl
   async function save() {
     setBusy(true); setMessage("");
     try {
-      const { error } = await rawSupabase!.rpc("multi_set_profile_visuals", { team, photo, avatar });
+      const { error } = await rawSupabase!.rpc(coach ? "multi_set_coach_visuals" : "multi_set_profile_visuals", { team, photo, avatar });
       setMessage(error ? error.message : "Foto y avatar guardados.");
     } catch { setMessage("No se pudo conectar. Inténtalo de nuevo."); }
     finally { setBusy(false); }
   }
-  return <details className="profile-visual-editor"><summary>Personalizar mi perfil</summary>
+  return <details className="profile-visual-editor"><summary>{coach ? "Personalizar mi perfil de entrenador" : "Personalizar mi perfil de jugador"}</summary>
     <div className="profile-visual-grid">
       <div><h3>Mi foto</h3>{photo ? <img className="profile-photo" src={photo} alt="Tu foto de perfil" /> : <div className="profile-photo-placeholder">Sin foto</div>}
         <label className="visual-upload">Elegir foto<input type="file" accept="image/jpeg,image/png,image/webp" disabled={!ready} onChange={e => void upload(e.target.files?.[0])} /></label>
@@ -72,3 +72,4 @@ export default function ProfileVisualEditor({ team, player }: { team: string; pl
     <p role="status">{message}</p>
   </details>;
 }
+
