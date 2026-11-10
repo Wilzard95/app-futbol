@@ -328,8 +328,8 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
                   <fieldset className="reaction-picker">
                     <legend>Reacción (opcional)</legend>
                     <div className="reaction-options">
-                      <button type="button" className="reaction-button" aria-label="Aprobación" aria-pressed={reaction === "approve"} onClick={() => setReaction(reaction === "approve" ? "" : "approve")}>👍 <span>Aprobación</span></button>
-                      <button type="button" className="reaction-button" aria-label="Desaprobación" aria-pressed={reaction === "disapprove"} onClick={() => setReaction(reaction === "disapprove" ? "" : "disapprove")}>👎 <span>Desaprobación</span></button>
+                      <button type="button" className="reaction-button" aria-label="Aprobación" aria-pressed={reaction === "approve"} onClick={() => setReaction(reaction === "approve" ? "" : "approve")}>👍</button>
+                      <button type="button" className="reaction-button" aria-label="Desaprobación" aria-pressed={reaction === "disapprove"} onClick={() => setReaction(reaction === "disapprove" ? "" : "disapprove")}>👎</button>
                     </div>
                     <small>Pulsa de nuevo para quitar tu reacción.</small>
                   </fieldset>

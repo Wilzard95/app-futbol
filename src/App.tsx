@@ -31,15 +31,17 @@ import Account from "./components/Account";
 import RealRatings from "./components/RealRatings";
 import RealLineups from "./components/RealLineups";
 import RealOverview from "./components/RealOverview";
+import RealTournaments from "./components/RealTournaments";
 import AccountHeader from "./components/AccountHeader";
 import LineupLab, { LineupOverview } from "./components/LineupLab";
 import { tournamentAverage } from "./domain/rules";
 import type { MatchEvent, Player } from "./domain/types";
 
-type View = "overview" | "players" | "matches" | "lineup" | "account";
+type View = "overview" | "players" | "matches" | "lineup" | "account" | "tournaments";
 const navigation: { id: View; label: string; icon: LucideIcon }[] = [
   { id: "overview", label: "Resumen", icon: LayoutDashboard },
   { id: "players", label: "Plantilla", icon: Users },
+  { id: "tournaments", label: "Mis torneos", icon: Trophy },
   { id: "matches", label: "Partidos", icon: CalendarDays },
   { id: "lineup", label: "Titular colectiva", icon: ClipboardList },
   { id: "account", label: "Mi cuenta", icon: LockKeyhole },
@@ -332,6 +334,8 @@ export default function App() {
                   ? "Dentro y fuera de la cancha."
                   : view === "players"
                     ? "Cada jugador cuenta."
+                    : view === "tournaments"
+                      ? "Cada torneo, una nueva historia."
                     : view === "matches"
                       ? "Nuestra historia, partido a partido."
                       : view === "lineup"
@@ -343,6 +347,8 @@ export default function App() {
                   ? "Lo que jugamos, lo que aprendemos y el equipo que construimos."
                   : view === "players"
                     ? "Una ficha por jugador. Sus números cambian con cada torneo."
+                    : view === "tournaments"
+                      ? "Organiza los torneos en los que participa tu equipo."
                     : view === "matches"
                       ? "Solo quienes participaron podrán valorar y recibir valoraciones."
                       : view === "lineup"
@@ -549,6 +555,7 @@ export default function App() {
               )}
             </>
           )}
+          {view === "tournaments" && <RealTournaments onAccount={() => setView("account")} />}
           {view === "matches" && (
             <>
               <RealRatings onAccount={() => setView("account")} />
