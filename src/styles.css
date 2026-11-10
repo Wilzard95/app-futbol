@@ -183,8 +183,20 @@ select {
   border-radius: 8px;
 }
 .team-crest img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
-.crest-upload, .visual-upload { display: inline-block; color: #527443; font-size: 11px; font-weight: 700; cursor: pointer; margin: 3px 4px 8px; }
-.crest-upload input, .visual-upload input { display: block; width: 100%; max-width: 190px; margin-top: 5px; color: #647969; font-size: 10px; }
+.team-crest-button { position: relative; flex: 0 0 auto; padding: 0; cursor: pointer; }
+.team-crest-button:hover, .team-crest-button[aria-expanded="true"] { box-shadow: 0 0 0 2px #a7c99a; }
+.crest-camera { position: absolute; right: -4px; bottom: -4px; width: 16px; height: 16px; display: grid; place-items: center; border-radius: 50%; background: #17452f; color: white; border: 2px solid white; }
+.crest-editor { padding: 14px; margin: 8px 0 12px; background: #f6faf2; border: 1px solid #dce9d5; border-radius: 12px; box-shadow: 0 7px 18px rgba(27, 65, 38, .06); }
+.crest-editor-heading { display: flex; align-items: flex-start; gap: 9px; }
+.crest-editor-icon { display: grid; place-items: center; flex: 0 0 30px; height: 30px; border-radius: 8px; background: #e3efdb; color: #46754c; }
+.crest-editor-heading strong { display: block; color: #1c442e; font-size: 12px; }
+.crest-editor-heading p { margin: 3px 0 0; color: #6a7c67; font-size: 10px; line-height: 1.45; }
+.team-switcher .crest-file-button { position: relative; display: flex; justify-content: center; margin: 12px 0 6px; padding: 9px 12px; background: #17452f; border-radius: 8px; color: #fff; font-size: 11px; cursor: pointer; }
+.crest-file-button:focus-within { outline: 3px solid #82a953; outline-offset: 3px; }
+.crest-file-button input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.crest-editor small { color: #7a8b74; font-size: 9px; }
+.visual-upload { display: inline-block; color: #527443; font-size: 11px; font-weight: 700; cursor: pointer; margin: 3px 4px 8px; }
+.visual-upload input { display: block; width: 100%; max-width: 190px; margin-top: 5px; color: #647969; font-size: 10px; }
 .profile-visual-editor { padding: 8px 18px 18px; margin: 20px 0; border: 1px solid #dce9d6; border-radius: 14px; background: #f7faf4; }
 .profile-visual-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-bottom: 18px; }
 .profile-photo, .profile-photo-placeholder, .profile-avatar-preview { width: 110px; height: 110px; border-radius: 18px; object-fit: cover; display: block; }

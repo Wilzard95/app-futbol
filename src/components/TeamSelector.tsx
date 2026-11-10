@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { Shield } from "lucide-react";
+import { Camera, ImagePlus, Shield } from "lucide-react";
 import { rawSupabase } from "../supabase";
 import { prepareImage } from "../domain/visuals";
 import type { Visuals } from "../domain/visuals";
@@ -18,6 +18,10 @@ export default function TeamSelector({ selected, onSelect, onAccount, onTeams }:
   const [busy, setBusy] = useState(false);
   const [creating, setCreating] = useState(false);
   const [crest, setCrest] = useState<string | null>(null);
+  const [crestOpen, setCrestOpen] = useState(false);
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+  const canEditCrest = !!session && teams.find(t => t.id === selected)?.role === "admin";
 
   useEffect(() => {
     let active = true;
@@ -49,17 +53,19 @@ export default function TeamSelector({ selected, onSelect, onAccount, onTeams }:
     return () => { active = false; };
   }, [session?.user.id]);
   useEffect(() => {
-    let active = true; setCrest(null);
+    let active = true; setCrest(null); setCrestOpen(false);
     if (selected && session) void rawSupabase!.rpc("multi_visuals", { team: selected }).then(({ data, error }) => { if (active && !error) setCrest((data as Visuals).crest); });
     return () => { active = false; };
   }, [selected, session?.user.id]);
   async function uploadCrest(file?: File) {
     if (!file || !selected) return;
+    const targetTeam = selected;
     setBusy(true); setMessage("");
     try {
       const image = await prepareImage(file);
-      const { error } = await rawSupabase!.rpc("multi_set_crest", { team: selected, image });
-      if (error) setMessage(error.message); else { setCrest(image); setMessage("Escudo actualizado."); }
+      const { error } = await rawSupabase!.rpc("multi_set_crest", { team: targetTeam, image });
+      if (selectedRef.current !== targetTeam) return;
+      if (error) setMessage(error.message); else { setCrest(image); setCrestOpen(false); setMessage("Escudo actualizado."); }
     } catch (e) { setMessage(e instanceof Error ? e.message : "No se pudo subir el escudo."); }
     finally { setBusy(false); }
   }
@@ -78,13 +84,13 @@ export default function TeamSelector({ selected, onSelect, onAccount, onTeams }:
     finally { setBusy(false); }
   }
   return <div className="team-switcher">
-    <div className="team-card"><span className="team-crest">{crest ? <img src={crest} alt="Escudo del equipo" /> : <Shield size={24} />}</span>
+    <div className="team-card">{canEditCrest ? <button type="button" className="team-crest team-crest-button" aria-label="Cambiar escudo del equipo" aria-expanded={crestOpen} aria-controls="crest-editor" onClick={() => setCrestOpen(!crestOpen)}>{crest ? <img src={crest} alt="" /> : <Shield size={24} />}<span className="crest-camera"><Camera size={10} /></span></button> : <span className="team-crest">{crest ? <img src={crest} alt="Escudo del equipo" /> : <Shield size={24} />}</span>}
       {session ? <label>Mi equipo<select aria-label="Seleccionar equipo" value={selected} onChange={e => onSelect(teams.find(t => t.id === e.target.value) ?? null)}>
         {!teams.length && <option value="">Sin equipos</option>}
         {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
       </select></label> : <button type="button" className="text-button" onClick={onAccount}>Inicia sesión para elegir equipo</button>}
     </div>
-    {session && teams.find(t => t.id === selected)?.role === "admin" && <label className="crest-upload">Cambiar escudo<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={e => void uploadCrest(e.target.files?.[0])} /></label>}
+    {canEditCrest && crestOpen && <div className="crest-editor" id="crest-editor"><div className="crest-editor-heading"><span className="crest-editor-icon"><ImagePlus size={17} /></span><div><strong>Escudo del equipo</strong><p>Elige una imagen para identificar a tu equipo.</p></div></div><label className="crest-file-button">{busy ? "Subiendo…" : "Elegir imagen"}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={e => { const file = e.target.files?.[0]; e.target.value = ""; void uploadCrest(file); }} /></label><small>JPG, PNG o WebP · hasta 8 MB</small></div>}
     {session && <><button type="button" className="text-button" aria-expanded={creating} onClick={() => setCreating(!creating)}>＋ Crear nuevo equipo</button>
       {creating && <form className="account-form" onSubmit={create}><label>Nombre del equipo<input value={name} onChange={e => setName(e.target.value)} maxLength={100} required /></label><button disabled={busy || !name.trim()}>Crear equipo</button></form>}</>}
     <p role="status">{message}</p>
