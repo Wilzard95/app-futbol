@@ -37,7 +37,7 @@ const redirect = () => {
   return url.href;
 };
 
-export default function Account() {
+export default function Account({ hasTeam = true }: { hasTeam?: boolean }) {
   const [session, setSession] = useState<Session | null>(null);
   const [context, setContext] = useState<Context | null>(null);
   const [email, setEmail] = useState("");
@@ -77,8 +77,8 @@ export default function Account() {
   }, []);
   useEffect(() => {
     setContext(null);
-    if (session) void refresh();
-  }, [session?.user.id]);
+    if (session && hasTeam) void refresh();
+  }, [session?.user.id, hasTeam]);
   async function run(
     fn: () => PromiseLike<{ error: { message: string } | null }>,
     success: string,
@@ -217,6 +217,8 @@ export default function Account() {
         <p role="status">{message}</p>
       </section>
     );
+  if (!hasTeam)
+    return <section className="panel connected-panel"><h2>Mi cuenta</h2><p>{session.user.email}</p><p>Crea un equipo o abre una invitación para continuar.</p><button className="text-button" onClick={() => void client.auth.signOut()}>Cerrar sesión</button></section>;
   return (
     <section className="panel connected-panel">
       <div className="section-heading">
@@ -422,8 +424,7 @@ export default function Account() {
       )}
       <p role="status">{message}</p>
       <p className="panel-footnote">
-        Los partidos, notas y titulares siguen siendo una simulación
-        independiente de las cuentas.
+        Tu ficha y tus permisos corresponden al equipo seleccionado.
       </p>
     </section>
   );

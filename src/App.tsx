@@ -10,7 +10,6 @@ import {
   Flag,
   LayoutDashboard,
   LockKeyhole,
-  Shield,
   Target,
   Trophy,
   Users,
@@ -22,7 +21,6 @@ import {
   matchEvents,
   matches as demoMatches,
   players,
-  teamName,
   proposals as demoProposals,
   tournaments,
 } from "./data/demo";
@@ -33,6 +31,9 @@ import RealLineups from "./components/RealLineups";
 import RealOverview from "./components/RealOverview";
 import RealTournaments from "./components/RealTournaments";
 import AccountHeader from "./components/AccountHeader";
+import TeamSelector from "./components/TeamSelector";
+import type { Team } from "./components/TeamSelector";
+import { setActiveTeam } from "./supabase";
 import LineupLab, { LineupOverview } from "./components/LineupLab";
 import { tournamentAverage } from "./domain/rules";
 import type { MatchEvent, Player } from "./domain/types";
@@ -81,6 +82,9 @@ function PlayerAvatar({
 }
 
 export default function App() {
+  const [team, setTeam] = useState<Team | null>(null);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const chooseTeam = (next: Team | null) => { setActiveTeam(next?.id ?? ""); setTeam(next); };
   const [view, setView] = useState<View>(() =>
     new URLSearchParams(location.search).has("account") ||
     !!localStorage.getItem("la-cancha-invite")
@@ -274,15 +278,7 @@ export default function App() {
             LA CANCHA<small>EL FÚTBOL ES DE TODOS</small>
           </span>
         </a>
-        <div className="team-card">
-          <span className="team-crest">
-            <Shield size={24} />
-          </span>
-          <div>
-            <strong>{teamName}</strong>
-            <span>Equipo en prueba</span>
-          </div>
-        </div>
+        <TeamSelector selected={team?.id ?? ""} onSelect={chooseTeam} onTeams={setTeams} onAccount={() => setView("account")} />
         <span className="nav-heading">VESTUARIO</span>
         <nav aria-label="Principal">
           {navigation.map(({ id, label, icon: Icon }) => (
@@ -321,9 +317,9 @@ export default function App() {
       <div className="workspace">
         <header className="topbar">
           <div className="breadcrumb">
-            {teamName} <span>/</span> <strong>{activeNav.label}</strong>
+            {team?.name ?? "Mi equipo"} <span>/</span> <strong>{activeNav.label}</strong>
           </div>
-          <AccountHeader onOpen={() => setView("account")} />
+          <AccountHeader key={`header-${team?.id}`} onOpen={() => setView("account")} />
         </header>
         <main id="main">
           <div className="page-heading">
@@ -361,6 +357,7 @@ export default function App() {
           {view === "overview" && (
             <>
               <RealOverview
+                key={`overview-${team?.id}`}
                 mode="overview"
                 onAccount={() => setView("account")}
               />
@@ -523,6 +520,7 @@ export default function App() {
           {view === "players" && (
             <>
               <RealOverview
+                key={`players-${team?.id}`}
                 mode="players"
                 onAccount={() => setView("account")}
               />
@@ -555,10 +553,10 @@ export default function App() {
               )}
             </>
           )}
-          {view === "tournaments" && <RealTournaments onAccount={() => setView("account")} />}
+          {view === "tournaments" && <RealTournaments key={`tournaments-${team?.id}`} team={team} teams={teams} onSelectTeam={chooseTeam} onAccount={() => setView("account")} />}
           {view === "matches" && (
             <>
-              <RealRatings onAccount={() => setView("account")} />
+              <RealRatings key={`matches-${team?.id}`} onAccount={() => setView("account")} />
               {import.meta.env.DEV && (
                 <details>
                   <summary>Simulación de partidos (datos de prueba)</summary>
@@ -607,7 +605,7 @@ export default function App() {
           )}
           {view === "lineup" && (
             <>
-              <RealLineups onAccount={() => setView("account")} />
+              <RealLineups key={`lineup-${team?.id}`} onAccount={() => setView("account")} />
               {import.meta.env.DEV && (
                 <details>
                   <summary>Simulación de titulares (datos de prueba)</summary>
@@ -623,7 +621,7 @@ export default function App() {
               )}
             </>
           )}
-          {view === "account" && <Account />}
+          {view === "account" && <Account key={`account-${team?.id}`} hasTeam={!!team} />}
 
           <footer className="page-footer">
             <span>

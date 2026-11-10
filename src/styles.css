@@ -161,6 +161,18 @@ select {
   padding: 12px 10px;
   margin: 39px 0 30px;
 }
+.team-switcher { min-width: 0; }
+.team-switcher .team-card { margin-bottom: 8px; }
+.team-switcher label { display: grid; gap: 4px; min-width: 0; color: #647b65; font-size: 10px; font-weight: 700; }
+.team-switcher select { max-width: 155px; border: 0; background: transparent; color: #143d2b; font-weight: 700; font-size: 12px; }
+.team-switcher > .text-button { margin: 0 0 24px 4px; font-size: 11px; }
+.team-switcher > .account-form { margin: 0 0 18px; padding: 10px; background: #f6f9f2; border-radius: 9px; }
+.team-switcher > p { font-size: 11px; overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .team-switcher .team-card { margin: 0; }
+  .team-switcher > .text-button { margin: 2px 0; }
+  .team-switcher select { max-width: 125px; }
+}
 .team-crest {
   display: grid;
   place-items: center;
