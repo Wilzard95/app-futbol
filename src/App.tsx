@@ -553,7 +553,7 @@ export default function App() {
           {view === "tournaments" && <RealTournaments key={`tournaments-${team?.id}`} team={team} teams={teams} onSelectTeam={chooseTeam} onAccount={() => setView("account")} />}
           {view === "matches" && (
             <>
-              <RealRatings key={`matches-${team?.id}`} onAccount={() => setView("account")} />
+              <RealRatings key={`matches-${team?.id}`} teamId={team?.id ?? ""} onAccount={() => setView("account")} />
               {import.meta.env.DEV && (
                 <details>
                   <summary>Simulación de partidos (datos de prueba)</summary>
