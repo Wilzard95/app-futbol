@@ -174,7 +174,7 @@ export default function RealAdmin({
         </button>
       </form>
       <h3>Registrar acción</h3>
-      <p>Registra las acciones antes de abrir las valoraciones.</p>
+      <p>Puedes registrar acciones incluso después de abrir las valoraciones; las nuevas comienzan con ajuste cero.</p>
       <form className="account-form" onSubmit={addEvent}>
         <label>
           Partido
