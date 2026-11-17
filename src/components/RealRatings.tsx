@@ -4,6 +4,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
 import { eventRules } from "../domain/events";
 import RealAdmin from "./RealAdmin";
+import MatchManager from "./MatchManager";
 import type { MatchEventKind } from "../domain/types";
 import { PlayerFace, PlayerPicker } from "./PlayerIdentity";
 
@@ -57,7 +58,7 @@ const eventIcons: Record<MatchEventKind, string> = {
   clean_sheet: "🧤",
 };
 
-export default function RealRatings({ onAccount }: { onAccount: () => void }) {
+export default function RealRatings({ onAccount, teamId }: { onAccount: () => void; teamId: string }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState<Data | null>(null);
@@ -247,6 +248,7 @@ export default function RealRatings({ onAccount }: { onAccount: () => void }) {
           onRefresh={refreshSports}
         />
       )}
+      {data.role === "admin" && <MatchManager teamId={teamId} games={data.matches} players={data.players} roster={data.roster} onRefresh={refreshSports} />}
       <div className="account-form match-rating-pickers">
         <label>
           Partido
